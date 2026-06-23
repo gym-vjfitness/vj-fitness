@@ -1,0 +1,106 @@
+<div class="h-full bg-background text-foreground font-sans selection:bg-primary/20 relative overflow-y-auto">
+
+  <div class="absolute top-0 inset-x-0 h-[30vh] bg-gradient-to-b from-surface/50 to-transparent pointer-events-none z-0"></div>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 relative z-10 pt-6 md:pt-10 pb-4">
+
+    <header class="mb-8 flex items-center gap-3 sm:gap-4">
+      <button (click)="goBack()" [disabled]="isSaving()" class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 bg-surface border border-border/60 hover:bg-border/80 rounded-full flex items-center justify-center text-muted hover:text-foreground transition-colors shadow-sm cursor-pointer disabled:opacity-50">
+        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+      </button>
+
+      <div class="flex-1 flex flex-col sm:flex-row sm:items-baseline sm:gap-2 overflow-hidden">
+        <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground truncate">
+          Access Control
+        </h1>
+        <p class="text-muted text-xs sm:text-sm font-medium truncate">
+          Managing: <span class="text-foreground font-bold">{{ trainerName() }}</span>
+        </p>
+      </div>
+    </header>
+
+    @if (isLoading()) {
+      <div class="bg-surface/50 rounded-3xl p-10 flex flex-col items-center justify-center min-h-[250px]">
+        <svg class="animate-spin h-8 w-8 text-primary mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <p class="text-muted font-medium text-xs">Loading permissions...</p>
+      </div>
+    } 
+    @else if (permissions()) {
+      
+      <div class="flex items-center justify-between mb-4 px-1">
+        <!-- <h2 class="text-base sm:text-lg font-bold text-foreground">Dashboard Modules</h2> -->
+        <span class="px-2.5 py-1 rounded-full bg-surface text-[12px] sm:text-xs font-semibold text-muted shadow-sm">
+          Enables access to trainer-specific tabs.
+        </span>
+      </div>
+
+      <div class="flex flex-col gap-3 sm:gap-4">
+        
+        @for (field of permissionFields; track field.key) {
+          <label class="group relative flex items-center justify-between p-4 sm:p-5 cursor-pointer transition-colors duration-200 rounded-[1.25rem]"
+                 [ngClass]="permissions()?.[field.key] ? 'bg-surface shadow-sm' : 'bg-surface/40 hover:bg-surface/70'">
+            
+            <div class="flex items-center gap-3 sm:gap-4 z-10 w-full pr-3">
+              
+              <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200"
+                   [ngClass]="permissions()?.[field.key] ? 'bg-success/10 text-success' : 'bg-background text-secondary'">
+                <span class="w-5 h-5 flex items-center justify-center" [innerHTML]="field.icon"></span>
+              </div>
+
+              <div class="flex flex-col">
+                <h3 class="font-bold text-[14px] sm:text-[15px] text-foreground leading-tight">
+                  {{ field.label }}
+                </h3>
+                <p class="text-muted text-[11px] sm:text-xs font-medium mt-0.5 leading-snug line-clamp-2">
+                  {{ field.description }}
+                </p>
+              </div>
+            </div>
+
+            <div class="relative inline-flex items-center shrink-0 ml-1 z-10">
+              <input type="checkbox" class="sr-only peer" 
+                     [checked]="$safeNavigationMigration(permissions()?.[field.key])" 
+                     (change)="togglePermission(field.key)">
+              
+              <div class="w-[44px] h-[26px] sm:w-[48px] sm:h-[28px] rounded-full transition-colors duration-200 ease-in-out"
+                   [ngClass]="permissions()?.[field.key] ? 'bg-success' : 'bg-secondary/30'"></div>
+              
+              <div class="absolute left-[2px] top-[2px] w-[22px] h-[22px] sm:w-[24px] sm:h-[24px] rounded-full transition-transform duration-200 ease-out shadow-sm flex items-center justify-center"
+                   [ngClass]="permissions()?.[field.key] ? 'translate-x-[18px] sm:translate-x-[20px] bg-background' : 'translate-x-0 bg-secondary'">
+                   @if (permissions()?.[field.key]) {
+                     <svg class="w-3 h-3 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4">
+                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                     </svg>
+                   }
+              </div>
+            </div>
+          </label>
+        }
+
+      </div>
+
+      <div class="mt-8 pt-6 border-t border-border/40 flex flex-col-reverse sm:flex-row justify-end gap-3">
+        
+        <button (click)="goBack()" [disabled]="isSaving()" 
+                class="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-full font-bold text-sm bg-surface border border-border/80 text-secondary hover:text-foreground hover:bg-border/50 transition-colors disabled:opacity-50">
+          Cancel
+        </button>
+        
+        <button (click)="saveAccess()" [disabled]="isSaving() || !hasUnsavedChanges()" 
+                class="w-full sm:w-auto px-7 py-3 sm:py-2.5 rounded-full font-bold text-sm transition-all flex justify-center items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                [ngClass]="hasUnsavedChanges() ? 'bg-foreground text-background shadow-md hover:opacity-90' : 'bg-surface border border-border text-muted'">
+          
+          @if (isSaving()) {
+            <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Saving...
+          } @else {
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            Save Changes
+          }
+        </button>
+
+      </div>
+    }
+
+  </div>
+</div>

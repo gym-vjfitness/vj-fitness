@@ -1,0 +1,149 @@
+@use "tailwindcss";
+@import 'leaflet/dist/leaflet.css';
+
+/* 1. Define Premium Semantic Variables */
+@layer base {
+  :root {
+    /* --- Light Mode Palette (Studio White & Absolute Black) --- */
+    --primary: #8fa732;      /* Pure black for high-impact, premium buttons */
+    --primary-fg: #ffffff;   /* Pure white text */
+    
+    --secondary: #f0f0f0;    /* Soft studio white for secondary buttons */
+    --secondary-fg: #000000; 
+    
+    --accent: #CCFF00;       /* Electric Lime / Volt (High-end athletic energy) */
+    --accent-fg: #000000;    /* Black text on lime for perfect readability */
+
+    --background: #ffffff;   /* Pure, stark white */
+    --surface: #fafafa;      /* Barely-there off-white for subtle card elevation */
+    
+    --foreground: #000000;   /* Pure black text for maximum sharpness */
+    --muted: #737373;        /* Neutral tone for hints (No blue/brown tint) */
+    
+    --border: #e5e5e5;       /* Clean neutral borders */
+    --ring: #CCFF00;         /* Electric Lime focus rings */
+    --link: #000000;         /* Sleek black hypertext */
+
+    /* System Status Colors */
+    --info: #000000;         
+    --success: #16a34a;      
+    --warning: #eab308;      
+    --danger: #dc2626;       
+
+    /* radius variable for consistent curvature */
+    --radius: 0.25rem;       /* 4px - Very sharp, precise, and modern */
+  }
+
+  /* --- Dark Mode Overrides (Pitch Black & Electric Lime) --- */
+  .dark {
+    --primary: #CCFF00;      /* Electric Lime buttons (Extremely high energy & premium) */
+    --primary-fg: #000000;   /* Black text on lime buttons */
+
+    --secondary: #171717;    /* Deep matte black for secondary elements */
+    --secondary-fg: #ffffff;
+
+    --accent: #ffffff;       /* Pure white accents to balance the lime */
+    --accent-fg: #000000;    
+
+    --background: #000000;   /* Absolute pure pitch black (Elite, immersive feel) */
+    --surface: #0a0a0a;      /* Barely raised black for cards */
+    
+    --foreground: #ffffff;   /* Pure white text */
+    --muted: #a3a3a3;        /* Neutral light tone for muted text */
+    
+    --border: #262626;       /* Stealthy dark borders */
+    --ring: #CCFF00;         
+    --link: #CCFF00;
+
+    --info: #ffffff;
+    --success: #22c55e;
+    --warning: #facc15;
+    --danger: #ef4444;
+  }
+}
+
+/* 2. Map Variables to Tailwind Utilities */
+@theme {
+  --font-sans: "Poppins", sans-serif;
+
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-fg: var(--secondary-fg);
+  
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-link: var(--link);
+
+  --color-info: var(--info);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --radius-xl: var(--radius);
+}
+
+
+/* 3. Hide scrollbars completely */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none;
+}
+
+html,
+body,
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+
+/* 4. Aggressive Mobile OS Overrides (Kills Search & Highlights) */
+* {
+  -webkit-tap-highlight-color: transparent; 
+  -webkit-touch-callout: none; 
+}
+
+body {
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior-y: none; /* Stops pull-to-refresh native behavior */
+}
+
+a, img, label, button {
+  -webkit-user-drag: none; 
+  touch-action: manipulation;
+}
+
+/* 5. Re-enable text selection ONLY for form inputs */
+input, 
+textarea, 
+[contenteditable="true"] {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+
+/* 6. Theme Transitioning */
+.theme-transitioning,
+.theme-transitioning *,
+.theme-transitioning ::before,
+.theme-transitioning ::after {
+  transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              fill 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              stroke 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.7s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}

@@ -1,0 +1,431 @@
+@if (!isLoading()) {
+<div class="relative z-10 h-full bg-transparent p-4 md:p-8 animate-fade-in font-sans overflow-x-hidden pb-0">
+
+  <div class="max-w-6xl mx-auto">
+
+    <!-- HEADER / HERO -->
+    <header class="mb-6 relative">
+      <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-foreground leading-none">
+        {{ getGreeting() }}, <span class="text-primary">{{ (user()?.full_name || 'Athlete').split(' ')[0] }}</span>
+      </h1>
+
+      <!-- Proper spacing below the quote -->
+      <div class="mt-5 pb-2">
+        <p class="text-muted font-bold text-[13px] tracking-wide italic border-l-[3px] border-primary/40 pl-4 py-0.5">
+          "{{ dailyQuote() }}"
+        </p>
+      </div>
+
+      <!-- PREMIUM ELEGANT BIRTHDAY BANNER -->
+      @if (isBirthday()) {
+      <div
+        class="mt-4 relative overflow-hidden rounded-[1.5rem] border border-[#f59e0b]/20 bg-surface/50 backdrop-blur-xl p-5 sm:p-6 flex items-center justify-between shadow-[0_4px_30px_rgba(245,158,11,0.08)]">
+        <!-- Animated background glow -->
+        <div class="absolute inset-0 bg-gradient-to-r from-[#f59e0b] to-[#fbbf24] animate-bg-pulse pointer-events-none">
+        </div>
+
+        <div class="relative z-10 flex items-center gap-4 sm:gap-6">
+          <div
+            class="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-[#fef3c7] to-[#fde68a] flex items-center justify-center border border-[#fcd34d] shadow-sm animate-elegant-float">
+            <span class="text-3xl drop-shadow-md">🎁</span>
+          </div>
+          <div>
+            <h4 class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-widest mb-1">A Special Day</h4>
+            <p class="text-[15px] sm:text-lg font-black animate-gold-text tracking-tight leading-snug max-w-lg">
+              {{ birthdayMessage() }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Decorative floating icon right side -->
+        <div class="hidden md:block relative z-10 mr-4 animate-elegant-float" style="animation-delay: 1s;">
+          <span class="text-4xl opacity-80 drop-shadow-sm">🥂</span>
+        </div>
+      </div>
+      }
+    </header>
+
+    <!-- TOP STATS ROW (Dynamic Grid) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-6">
+
+      <!-- ATTENDANCE WIDGET -->
+      <div
+        class="col-span-1 lg:col-span-1 relative drop-shadow-[0_0_12px_rgba(59,130,246,0.2)] group hover:drop-shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all duration-500 h-full min-h-[145px]">
+        <div class="w-full h-full p-[1.5px] bg-primary/40"
+          style="clip-path: polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px);">
+          <div class="w-full h-full bg-surface/90 backdrop-blur-xl flex flex-col relative overflow-hidden"
+            style="clip-path: polygon(23px 0, 100% 0, 100% calc(100% - 23px), calc(100% - 23px) 100%, 0 100%, 0 23px);">
+            <div
+              class="absolute -top-10 -left-10 w-32 h-32 bg-primary/20 blur-2xl rounded-full pointer-events-none group-hover:bg-primary/30 transition-all duration-500">
+            </div>
+
+            <div class="p-4 flex items-center justify-between relative z-10 w-full">
+              <span class="text-[11px] font-black text-muted uppercase tracking-widest">Today's Log</span>
+              @if (attendanceToday()) {
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                <span
+                  class="relative inline-flex rounded-full h-2.5 w-2.5 bg-success shadow-[0_0_8px_rgba(34,197,94,1)]"></span>
+              </span>
+              } @else {
+              <div class="w-2.5 h-2.5 rounded-full bg-muted/30"></div>
+              }
+            </div>
+
+            <div class="px-4 pb-4 mt-auto relative z-10">
+              @if (attendanceToday()) {
+              <span class="text-3xl font-black text-foreground block leading-none tracking-tight">Present</span>
+              <div class="flex flex-col mt-3 gap-1.5">
+                <p
+                  class="text-[10px] font-bold text-success uppercase tracking-widest flex items-center gap-1.5 bg-success/10 w-fit px-2.5 py-0.5 rounded-md border border-success/20">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  IN: {{ $safeNavigationMigration(attendanceToday()?.check_in_time) | date:'shortTime' }}
+                </p>
+                @if (attendanceToday()?.check_out_time) {
+                <p
+                  class="text-[10px] font-bold text-muted uppercase tracking-widest flex items-center gap-1.5 bg-background w-fit px-2.5 py-0.5 rounded-md border border-border">
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  OUT: {{ $safeNavigationMigration(attendanceToday()?.check_out_time) | date:'shortTime' }}
+                </p>
+                }
+              </div>
+              } @else {
+              <span class="text-2xl font-black text-muted block leading-none tracking-tight">Pending</span>
+              <button
+                class="mt-2 text-[10px] font-bold text-primary uppercase tracking-widest hover:underline cursor-pointer">Mark
+                Attendance &rarr;</button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DYNAMIC SUBSCRIPTION WIDGET -->
+      @if (activeSubscription()) {
+      <!-- Premium VIP Card (When plan exists) -->
+      <div
+        class="col-span-1 lg:col-span-1 rounded-[2rem] bg-gradient-to-br from-surface to-background border border-border/60 p-5 flex flex-col relative overflow-hidden shadow-sm group hover:shadow-md transition-shadow">
+        <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/10 blur-3xl rounded-full"></div>
+        <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-accent/10 blur-3xl rounded-full"></div>
+
+        <div class="flex items-center justify-between mb-4 relative z-10">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <div
+              class="w-6 h-6 shrink-0 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
+              <div class="w-2 h-2 rounded-full bg-primary"></div>
+            </div>
+            <span class="text-[10px] font-black text-foreground uppercase tracking-widest truncate">{{
+              activeSubscription().purchased_plan_name }}</span>
+          </div>
+          <span
+            class="shrink-0 px-2 py-1 rounded-2xl bg-background border border-foreground text-[8px] font-black text-primary uppercase tracking-widest shadow-sm">{{activeSubscription().status}}</span>
+        </div>
+
+        <div class="mt-auto relative z-10">
+          <div class="flex items-end justify-between mb-3">
+            <div>
+              <span class="text-4xl font-black text-foreground leading-none tracking-tight">{{
+                getDaysRemaining(activeSubscription().end_date) }}</span>
+              <span class="text-[10px] font-bold text-muted ml-1 uppercase tracking-widest">Days left</span>
+            </div>
+          </div>
+          <!-- Sleek Progress -->
+          <div class="w-full h-1.5 bg-background rounded-full overflow-hidden border border-border/50">
+            <div
+              class="h-full bg-gradient-to-r from-primary to-accent rounded-full relative transition-all duration-1000"
+              [style.width.%]="subsProgress()"></div>
+          </div>
+          <div class="flex justify-between items-center mt-2">
+            <span class="text-[9px] font-bold text-muted uppercase tracking-widest">Valid Till</span>
+            <span class="text-[9px] font-bold text-foreground uppercase tracking-widest">{{
+              activeSubscription().end_date | date:'MMM d, y' }}</span>
+          </div>
+        </div>
+      </div>
+      } @else {
+      <!-- Old Warning Div (When no active plan exists) -->
+      <div
+        class="col-span-1 lg:col-span-1 rounded-[2rem] bg-surface/80 backdrop-blur-xl border border-warning/30 p-5 shadow-sm flex flex-col relative overflow-hidden">
+        <svg class="absolute -right-2 -bottom-2 w-20 h-20 opacity-[0.03] text-warning pointer-events-none" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+
+        <div class="flex gap-3 items-center mb-4 relative z-10 mt-auto">
+          <div class="p-2.5 rounded-full bg-warning/10 flex items-center justify-center border border-warning/20">
+            <svg class="w-6 h-6 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <span class="text-4xl sm:text-5xl font-black text-foreground mb-1">{{ daysToExpiry() || 0 }}</span>
+        </div>
+        <span class="text-[12px] font-black text-warning uppercase tracking-widest relative z-10">Days Remaining</span>
+      </div>
+      }
+
+      <!-- VITALS MINI BENTO -->
+      <div class="col-span-1 md:col-span-2 lg:col-span-2 grid grid-cols-3 gap-3">
+        <div
+          class="rounded-[2rem] bg-surface/50 backdrop-blur-xl border border-border/40 flex flex-col items-center justify-center p-3 relative overflow-hidden hover:bg-surface/80 transition-colors cursor-pointer">
+          <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1">Weight</span>
+          <span class="text-2xl font-black text-foreground">{{ latestVitals()?.weight_kg || '--' }} <span
+              class="text-[10px] font-bold text-muted">kg</span></span>
+        </div>
+        <div
+          class="rounded-[2rem] bg-surface/50 backdrop-blur-xl border border-border/40 flex flex-col items-center justify-center p-3 relative overflow-hidden hover:bg-surface/80 transition-colors cursor-pointer">
+          <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1">Height</span>
+          <span class="text-2xl font-black text-foreground">{{ latestVitals()?.height_cm || '--' }} <span
+              class="text-[10px] font-bold text-muted">cm</span></span>
+        </div>
+        <div
+          class="rounded-[2rem] bg-surface/50 backdrop-blur-xl border border-border/40 flex flex-col items-center justify-center p-3 relative overflow-hidden hover:bg-surface/80 transition-colors">
+          <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1">BMI</span>
+          <span class="text-2xl font-black" [ngClass]="bmi() ? 'text-accent' : 'text-muted'">{{ bmi() || '--' }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NAVIGATION / QUICK LINKS BENTO -->
+    <div class="mt-2 mb-4 flex items-center justify-between">
+      <h3 class="text-lg font-black text-foreground tracking-tight pl-1">Quick Access</h3>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
+      <div [routerLink]="['/member/profile']"
+        class="p-4 rounded-[1.5rem] bg-surface/60 border border-border/40 hover:bg-surface transition-colors cursor-pointer flex flex-col items-center text-center gap-2.5 group">
+        <div
+          class="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <span class="font-bold text-[10px] text-muted uppercase tracking-widest">Profile</span>
+      </div>
+
+      <div [routerLink]="['/member/health-tracker']"
+        class="p-4 rounded-[1.5rem] bg-surface/60 border border-border/40 hover:bg-surface transition-colors cursor-pointer flex flex-col items-center text-center gap-2.5 group">
+        <div
+          class="w-12 h-12 rounded-full bg-success/10 text-success flex items-center justify-center group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <span class="font-bold text-[10px] text-muted uppercase tracking-widest">Health Tracker</span>
+      </div>
+
+      <div [routerLink]="['/member/attendance/detail']"
+        class="p-4 rounded-[1.5rem] bg-surface/60 border border-border/40 hover:bg-surface transition-colors cursor-pointer flex flex-col items-center text-center gap-2.5 group">
+        <div
+          class="w-12 h-12 rounded-full bg-accent/10 text-accent flex items-center justify-center group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <span class="font-bold text-[10px] text-muted uppercase tracking-widest">Attendance Stats</span>
+      </div>
+
+      <div [routerLink]="['/member/plans']"
+        class="p-4 rounded-[1.5rem] bg-surface/60 border border-border/40 hover:bg-surface transition-colors cursor-pointer flex flex-col items-center text-center gap-2.5 group">
+        <div
+          class="w-12 h-12 rounded-full bg-warning/10 text-warning flex items-center justify-center group-hover:scale-110 transition-transform">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        </div>
+        <span class="font-bold text-[10px] text-muted uppercase tracking-widest">Gym Plans</span>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT GRID (Workouts & Diet) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 mb-8">
+
+      <!-- WORKOUT ACCORDION CARD -->
+      <div
+        class="rounded-[2.5rem] bg-surface/80 backdrop-blur-xl border border-border/40 p-5 sm:p-7 shadow-sm relative overflow-hidden">
+        <svg class="absolute -right-6 -bottom-6 w-32 h-32 opacity-[0.02] text-foreground pointer-events-none -rotate-12"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+        </svg>
+
+        <div class="flex items-center justify-between relative z-10 cursor-pointer group" (click)="toggleWorkout()">
+          <!-- STRICT ONE-LINER HEADER -->
+          <div class="flex items-center gap-4 overflow-hidden pr-2">
+            <div
+              class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+              <span class="text-xl">🏋️</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <h3 class="text-lg md:text-xl font-black text-foreground tracking-tight truncate">Today's Workout</h3>
+              <p class="text-[10px] font-bold text-muted uppercase tracking-widest mt-1 truncate">
+                {{ todayName() }}
+                <span *ngIf="todayWorkout()?.focusMuscle" class="text-primary ml-1">• {{ todayWorkout()!.focusMuscle
+                  }}</span>
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center text-muted transition-transform duration-300 shrink-0"
+            [ngClass]="workoutExpanded() ? 'rotate-180' : ''">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Smooth CSS Grid Accordion Transition -->
+        <div class="grid transition-all duration-500 ease-in-out relative z-10"
+          [ngClass]="workoutExpanded() ? 'grid-rows-[1fr] opacity-100 mt-6' : 'grid-rows-[0fr] opacity-0'">
+          <div class="overflow-hidden">
+
+            @if (!workoutAssigned()) {
+            <div
+              class="py-6 flex flex-col items-center justify-center text-center bg-background/50 rounded-2xl border border-dashed border-border/60">
+              <p class="font-black text-foreground">No Plan Assigned</p>
+              <p class="text-xs text-muted font-bold mt-1">Talk to your admin to get a workout routine.</p>
+            </div>
+            } @else if (todayWorkout()?.exercises?.length > 0) {
+            <div class="space-y-3">
+              @for (ex of todayWorkout()!.exercises; track ex.exercise_id) {
+              <div
+                class="flex items-center justify-between p-3.5 rounded-2xl bg-background border border-border/50 hover:border-primary/40 transition-colors">
+                <div class="truncate pr-4">
+                  <p class="font-bold text-sm text-foreground truncate">{{ ex.name }}</p>
+                  <p class="text-[11px] text-muted font-semibold mt-0.5">{{ ex.sets }} Sets • {{
+                    ex.setDetails?.join('/') }} Reps</p>
+                </div>
+                <div
+                  class="w-8 h-8 rounded-full bg-surface border border-border flex items-center justify-center text-muted hover:text-primary transition-colors cursor-pointer shrink-0">
+                  <svg class="w-4 h-4 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
+                  </svg>
+                </div>
+              </div>
+              }
+            </div>
+            } @else {
+            <div
+              class="py-6 flex flex-col items-center justify-center text-center bg-background/50 rounded-2xl border border-dashed border-border/60">
+              <div class="text-3xl mb-2">🛌</div>
+              <p class="font-black text-foreground">Rest Day</p>
+              <p class="text-xs text-muted font-bold mt-1">Muscles grow when you rest. Enjoy recovery!</p>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- DIET ACCORDION CARD -->
+      <div
+        class="rounded-[2.5rem] bg-surface/80 backdrop-blur-xl border border-border/40 p-5 sm:p-7 shadow-sm relative overflow-hidden">
+        <svg class="absolute -right-8 -bottom-8 w-40 h-40 opacity-[0.03] text-success pointer-events-none rotate-12"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+
+        <div class="flex items-center justify-between relative z-10 cursor-pointer group" (click)="toggleDiet()">
+          <!-- STRICT ONE-LINER HEADER -->
+          <div class="flex items-center gap-4 overflow-hidden pr-2">
+            <div
+              class="w-12 h-12 rounded-2xl bg-success/10 flex items-center justify-center border border-success/20 shrink-0">
+              <span class="text-xl">🥗</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <h3 class="text-lg md:text-xl font-black text-foreground tracking-tight truncate">Dietary Fuel</h3>
+              <p class="text-[10px] font-bold text-muted uppercase tracking-widest mt-1 truncate">Nutrition Plan</p>
+            </div>
+          </div>
+
+          <div
+            class="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center text-muted transition-transform duration-300 shrink-0"
+            [ngClass]="dietExpanded() ? 'rotate-180' : ''">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Smooth CSS Grid Accordion Transition -->
+        <div class="grid transition-all duration-500 ease-in-out relative z-10"
+          [ngClass]="dietExpanded() ? 'grid-rows-[1fr] opacity-100 mt-6' : 'grid-rows-[0fr] opacity-0'">
+          <div class="overflow-hidden">
+
+            @if (!dietAssigned()) {
+            <div
+              class="py-6 flex flex-col items-center justify-center text-center bg-background/50 rounded-2xl border border-dashed border-border/60">
+              <p class="font-black text-foreground">No Diet Assigned</p>
+              <p class="text-xs text-muted font-bold mt-1">Focus on staying hydrated.</p>
+            </div>
+            } @else if (todayDiet()?.meals?.length > 0) {
+            <div class="space-y-5 px-2 mt-2">
+              @for (meal of todayDiet()!.meals; track meal.mealName) {
+              <div class="relative pl-5 border-l-2 border-border/50">
+                <div
+                  class="absolute w-2.5 h-2.5 rounded-full bg-success -left-[0.35rem] top-1 shadow-[0_0_8px_rgba(34,197,94,0.5)]">
+                </div>
+                <h4 class="text-[11px] font-black text-foreground uppercase tracking-widest mb-2.5">{{ meal.mealName }}
+                </h4>
+                <ul class="space-y-2">
+                  @for (item of meal.items; track item.food) {
+                  <li class="text-[13px] font-semibold text-muted flex items-start gap-2.5">
+                    <span class="text-base leading-none shrink-0">{{ item.icon }}</span>
+                    <span class="leading-tight">{{ item.food }}</span>
+                  </li>
+                  }
+                </ul>
+              </div>
+              }
+            </div>
+            } @else {
+            <div
+              class="py-6 flex flex-col items-center justify-center text-center bg-background/50 rounded-2xl border border-dashed border-border/60">
+              <div class="text-3xl mb-2">🍽️</div>
+              <p class="font-black text-foreground">Free Diet Day</p>
+              <p class="text-xs text-muted font-bold mt-1">Stick to your macros, enjoy mindfully.</p>
+            </div>
+            }
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+} @else {
+<!-- SKELETON LOADER -->
+<div class="min-h-screen bg-transparent p-4 md:p-8 font-sans overflow-x-hidden pb-24">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <div class="flex flex-col mb-14 gap-2">
+      <div class="h-10 w-64 bg-surface border border-border/50 rounded-xl animate-pulse"></div>
+      <div class="h-4 w-48 bg-surface border border-border/50 rounded-full animate-pulse mt-3"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 animate-pulse">
+      <div class="col-span-1 h-[145px] bg-surface/80 border-none rounded-tl-3xl rounded-br-3xl"></div>
+      <div class="col-span-1 h-[145px] rounded-[2rem] bg-surface/80 border border-border/40"></div>
+      <div class="col-span-1 md:col-span-2 grid grid-cols-3 gap-3">
+        <div class="h-[145px] rounded-[2rem] bg-surface/80 border border-border/40"></div>
+        <div class="h-[145px] rounded-[2rem] bg-surface/80 border border-border/40"></div>
+        <div class="h-[145px] rounded-[2rem] bg-surface/80 border border-border/40"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5 mt-4 animate-pulse">
+      <div class="h-[100px] rounded-[2.5rem] bg-surface/80 border border-border/40"></div>
+      <div class="h-[100px] rounded-[2.5rem] bg-surface/80 border border-border/40"></div>
+    </div>
+  </div>
+</div>
+}

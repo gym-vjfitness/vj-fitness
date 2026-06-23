@@ -1,0 +1,193 @@
+<div class="h-full bg-background text-foreground pb-32 font-sans selection:bg-primary/20 relative">
+
+  <div class="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none z-0"></div>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 pt-8 md:pt-12">
+
+    <!-- Premium Header -->
+    <header class="mb-10 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="text-center md:text-left">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-[1.5rem] bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30 mb-4 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+          <svg class="w-7 h-7 text-primary-fg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h18 M7 5v4l3 3v8 M17 5v4l-3 3v8 M12 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z M10 12h4" />
+          </svg>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+          Exercise Library
+        </h1>
+        <p class="text-muted mt-2 text-sm md:text-base">Manage all your gym exercises and movements.</p>
+      </div>
+
+      <button (click)="goToCreateExercise()" class="bg-primary/10 text-primary hover:bg-primary hover:text-primary-fg px-6 py-3.5 rounded-full font-bold transition-all flex items-center gap-2 shadow-sm cursor-pointer border border-primary/20 shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        New Exercise
+      </button>
+    </header>
+
+    <!-- Premium Search & Filter Bar -->
+    <div class="flex flex-col md:flex-row gap-4 mb-5 ">
+      
+      <!-- Search Input -->
+      <div class="flex-grow bg-surface/80 backdrop-blur-xl border border-border/60 rounded-full p-1.5 shadow-lg shadow-surface/20 flex items-center transition-all focus-within:border-primary/50">
+        <div class="pl-4 pr-2 text-primary">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        </div>
+        <input type="text" placeholder="Search exercises by name..." [ngModel]="searchInput()" (ngModelChange)="searchInput.set($event)" (keyup.enter)="performSearch()" class="w-full bg-transparent border-0 px-2 py-2.5 text-sm font-medium text-foreground placeholder:text-muted focus:ring-0 focus:outline-none">
+
+        @if (searchInput().length > 0) {
+          <button (click)="clearSearch()" title="Clear Search" class="px-3 text-muted hover:text-danger transition-all cursor-pointer bg-transparent border-none">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        }
+
+        <button (click)="performSearch()" class="shrink-0 bg-foreground text-primary-fg hover:opacity-90 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+        </button>
+      </div>
+
+      <!-- Filter Dropdown -->
+      <div class="filter-dropdown relative w-full md:w-56 flex flex-col group">
+        <div (click)="toggleFilterDropdown($event)" [class.border-primary]="isFilterDropdownOpen()" class="w-full h-full min-h-[52px] bg-surface/80 backdrop-blur-xl border border-border/60 text-foreground text-sm font-bold py-3.5 px-5 rounded-full flex justify-between items-center cursor-pointer hover:border-primary/50 transition-all shadow-lg shadow-surface/20">
+          <div class="flex items-center gap-2 truncate">
+            <span class="text-primary text-base leading-none">🎯</span>
+            <span [class.text-muted]="!selectedMuscleGroup()" class="truncate text-sm">
+              {{ selectedMuscleGroup() || 'All Muscles' }}
+            </span>
+          </div>
+          <svg [class.rotate-180]="isFilterDropdownOpen()" class="h-4 w-4 text-muted transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+
+        @if (isFilterDropdownOpen()) {
+          <div class="absolute top-full right-0 w-full mt-2 bg-surface/95 backdrop-blur-3xl border border-border/50 rounded-2xl shadow-2xl max-h-[300px] overflow-y-auto custom-scrollbar z-[100] animate-in slide-in-from-top-3 fade-in duration-200 py-1">
+            @for (muscle of muscleGroups; track muscle.name; let last = $last) {
+              <div (click)="selectMuscleFilter(muscle.name, $event)" 
+                   class="group/item flex items-center gap-3 px-4 py-3 hover:bg-background/80 transition-all cursor-pointer relative"
+                   [class.border-b]="!last" [class.border-border/40]="!last">
+                <div [class]="muscle.colorClass + ' w-7 h-7 shrink-0 rounded flex items-center justify-center border transition-all duration-300'">
+                  <svg class="w-4 h-4 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="muscle.path"/></svg>
+                </div>
+                <span class="font-bold text-foreground/90 text-sm truncate">{{ muscle.name }}</span>
+                @if (selectedMuscleGroup() === muscle.name || (!selectedMuscleGroup() && muscle.name === 'All Muscles')) {
+                  <svg class="w-4 h-4 ml-auto text-primary shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="bg-surface/50 backdrop-blur-xl border border-border/60 rounded-[2rem] p-8 min-h-[300px] flex items-center justify-center">
+        <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+      </div>
+    }
+    @else if (exercises().length === 0) {
+      <div class="bg-surface/30 border border-border/50 rounded-[2rem] p-16 text-center flex flex-col items-center">
+        <div class="w-16 h-16 bg-background rounded-full flex items-center justify-center mb-4 shadow-sm border border-border/40">
+          <svg class="w-8 h-8 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+        </div>
+        <h3 class="text-lg font-bold text-foreground mb-1">No Exercises Found</h3>
+        <p class="text-muted max-w-md text-xs">Try adjusting your search or filter criteria.</p>
+      </div>
+    }
+    @else {
+      <!-- True Mobile Layout Table (No horizontal scrolling) -->
+      <div class="w-full bg-surface/80 backdrop-blur border border-border/60 rounded-lg shadow-sm">
+        <table class="w-full text-left text-xs table-fixed">
+          <thead class="uppercase bg-surface border-b border-border/50 text-muted font-bold tracking-wider">
+            <tr>
+              <!-- Tightly constrained widths so the name column expands fully -->
+              <th class="px-2 sm:px-4 py-3 w-10 sm:w-16 text-center">No.</th>
+              <th class="px-2 sm:px-4 py-3 w-auto">Exercise Name</th>
+              <th class="px-1 sm:px-4 py-3 w-10 sm:w-16 text-center"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border/40">
+            @for (ex of exercises(); track ex.id; let i = $index) {
+              <tr class="hover:bg-background/40 transition-colors">
+                
+                <td class="px-2 sm:px-4 py-2 sm:py-3 text-center text-muted font-medium align-middle">
+                  {{ startIndex() + i }}
+                </td>
+                
+                <!-- Native wrapping with break-words to ensure it never overflows -->
+                <td class="px-2 sm:px-4 py-2 sm:py-3 font-semibold text-foreground whitespace-normal break-words leading-snug align-middle">
+                  {{ ex.name }}
+                </td>
+                
+                <td class="px-1 sm:px-4 py-2 sm:py-3 align-middle text-right relative action-menu">
+                  <!-- 3-Dots Action Trigger -->
+                  <button (click)="toggleMenu(ex.id!, $event)" class="p-1.5 text-muted hover:text-foreground rounded transition-colors focus:outline-none">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="5" r="1"></circle>
+                      <circle cx="12" cy="12" r="1"></circle>
+                      <circle cx="12" cy="19" r="1"></circle>
+                    </svg>
+                  </button>
+
+                  <!-- Floating Action Dropdown -->
+                  @if (openMenuId() === ex.id) {
+                    <div class="absolute right-6 top-6 mt-1 p-2 bg-secondary/10 border border-foreground/20 rounded-lg shadow-xl z-50 flex gap-2 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                      
+                      <!-- <button (click)="editExercise(ex.id!)" class="h-5 w-5  p-3   font-bold  text-info rounded-full bg-danger/50  hover:bg-info/10 transition-colors cursor-pointer ">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" class=""><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        
+                      </button> -->
+
+                      <button (click)="editExercise(ex.id!)"
+                    class="w-7 h-7 rounded-full border border-blue-500/50 bg-blue-900/30 flex items-center justify-center text-blue-400 hover:bg-blue-800/50 hover:text-blue-300 transition-all cursor-pointer"
+                    title="Edit">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                      
+                      <!-- <button (click)="deleteExercise(ex.id!)" class="w-full flex items-center gap-2 px-3 py-2.5 text-[11px] font-bold text-danger hover:bg-danger/10 border-t border-border/50 transition-colors cursor-pointer text-left">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        Delete
+                      </button> -->
+
+                      <button (click)="deleteExercise(ex.id!)"
+                    class="w-7 h-7 rounded-full border border-red-500/50 bg-red-900/30 flex items-center justify-center text-red-400 hover:bg-red-800/50 hover:text-red-300 transition-all cursor-pointer"
+                    title="Delete">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+
+                    </div>
+                  }
+                </td>
+
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination (Matching Plan Library exactly) -->
+      <div class="mt-8 flex flex-row justify-between items-center w-full gap-2">
+        <div class="bg-surface border border-border/40 rounded-full px-3.5 py-2 sm:px-5 sm:py-2.5 flex items-center shadow-sm shrink-0">
+          <span class="text-[11px] sm:text-sm font-extrabold text-primary">{{ startIndex() }}</span>
+          <span class="text-[11px] sm:text-sm font-bold text-muted/50 mx-1 sm:mx-2">-</span>
+          <span class="text-[11px] sm:text-sm font-extrabold text-primary">{{ endIndex() }}</span>
+          <span class="text-[9px] sm:text-xs font-bold text-muted mx-1.5 sm:mx-3 uppercase tracking-wider">Of</span>
+          <span class="text-[11px] sm:text-sm font-extrabold text-foreground">{{ totalItems() }}</span>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <button (click)="goToPrevPage()" [disabled]="!hasPrevPage()" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-surface border border-border/60 flex items-center justify-center text-muted hover:text-foreground hover:bg-background hover:border-border/80 disabled:opacity-30 disabled:hover:bg-surface disabled:hover:border-border/60 transition-all cursor-pointer disabled:cursor-not-allowed shadow-sm">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+
+          <button (click)="goToNextPage()" [disabled]="!hasNextPage()" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-surface border border-border/60 flex items-center justify-center text-muted hover:text-foreground hover:bg-background hover:border-border/80 disabled:opacity-30 disabled:hover:bg-surface disabled:hover:border-border/60 transition-all cursor-pointer disabled:cursor-not-allowed shadow-sm">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

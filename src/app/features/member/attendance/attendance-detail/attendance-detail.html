@@ -1,0 +1,271 @@
+<div class="relative w-full h-full bg-background text-foreground p-2 md:p-8 font-sans overflow-x-hidden  z-0">
+
+  <svg class="absolute top-0 right-0 w-[500px] h-[500px] text-primary/5 pointer-events-none -mr-40 -mt-20 z-[-1]" viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="50"/></svg>
+  <svg class="absolute bottom-40 left-0 w-[600px] h-[600px] text-accent/5 pointer-events-none -ml-40 z-[-1]" viewBox="0 0 100 100" fill="currentColor"><path d="M0,50 C20,100 80,0 100,50 C80,100 20,0 0,50 Z"/></svg>
+
+  <header class="mb-8 md:mb-10 pl-2">
+    <h1 class="text-4xl md:text-5xl font-black tracking-tight">Analytics</h1>
+    <p class="text-muted mt-2 text-sm md:text-base font-bold">Your performance overview.</p>
+  </header>
+
+  @if (isLoading()) {
+  <div class="flex items-center justify-center min-h-[50vh]">
+    <div class="w-12 h-12 border-4 border-surface border-t-primary rounded-full animate-spin drop-shadow-[0_0_15px_var(--color-primary)]"></div>
+  </div>
+  } @else {
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10 w-full">
+    
+    <div class="bg-background/50 backdrop-blur-xl border border-border  p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between relative overflow-hidden">
+      
+      <svg class="absolute -top-10 -right-6 w-56 h-56 text-foreground/5 rotate-12 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C12 2 11 7 8 9C5 11 3 14 3 17C3 21.9706 7.02944 26 12 26C16.9706 26 21 21.9706 21 17C21 13 18.5 9 15 7C15 7 16 11 12 13C12 13 13 8 12 2Z" />
+      </svg>
+
+      <div class="flex items-center gap-3 mb-8 relative z-10">
+        <span class="text-[11px] font-black text-muted uppercase tracking-[0.2em] whitespace-nowrap">Active Streak</span>
+        <div class="flex-grow h-px bg-border/40"></div>
+        <div class="flex items-baseline gap-1">
+          <span class="text-6xl font-bold text-foreground leading-none">{{ totalStreakCount() }}</span>
+          <span class="text-sm font-bold text-muted">Days</span>
+        </div>
+      </div>
+      
+      <div class="flex justify-between items-center relative z-10 px-2">
+        @for (day of weeklyStreak(); track day.date) {
+        <div class="flex flex-col items-center gap-2">
+          <span class="text-[10px] font-extrabold uppercase" [ngClass]="day.isToday ? 'text-primary' : 'text-muted'">{{ day.dayName }}</span>
+          <div class="w-8 h-8 flex items-center justify-center text-lg transition-all relative">
+            @if(day.isPresent){
+              <span class="relative z-10 drop-shadow-md" [ngClass]="{'animate-breathe': day.isLastActive}">🔥</span>
+            } @else if (!day.isFuture) {
+              <div class="w-1.5 h-1.5 rounded-full bg-border/60"></div>
+            } @else {
+              <div class="w-1.5 h-1.5 rounded-full bg-transparent"></div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="bg-surface/50 backdrop-blur-xl border border-border p-6 md:p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden flex items-center">
+      
+      <svg class="absolute -bottom-8 -left-8 w-48 h-48 text-primary/10 dark:text-primary/5 -rotate-12 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+
+      <div class="w-full flex items-center justify-between z-10">
+        
+        <div class="flex flex-col">
+          <span class="text-[11px] font-black text-muted uppercase tracking-[0.2em]">Last 30 Days</span>
+          <div class="flex items-baseline gap-1 mt-2">
+            <span class="text-6xl font-black text-foreground tracking-tighter">{{ thirtyDayProgress().presentDays }}</span>
+            <span class="text-lg font-bold text-muted">/ {{ thirtyDayProgress().totalDays }}</span>
+          </div>
+        </div>
+
+        <div class="relative w-28 h-28 flex-shrink-0">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            @for (isActive of thirtyDayProgress().segments; track $index) {
+              <line x1="50" y1="6" x2="50" y2="16" 
+                    [attr.transform]="'rotate(' + ($index * 12) + ' 50 50)'"
+                    [class]="isActive ? 'stroke-primary drop-shadow-[0_0_3px_var(--color-primary)]' : 'stroke-border/30'"
+                    stroke-width="4" stroke-linecap="round" />
+            }
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-lg font-black text-foreground">{{ thirtyDayProgress().percentage }}%</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="w-full mb-12">
+    <div class="w-full bg-surface/50 backdrop-blur-xl border border-border rounded-2xl px-1 py-6 md:p-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <div class="w-full h-[280px]">
+        <div echarts [options]="chartOption()" class="w-full h-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENHANCED PREMIUM ANALYTICS SECTION -->
+  @if (premiumStats()) {
+  <div class="w-full max-w-5xl mx-auto mb-12">
+    <h3 class="text-sm font-black text-foreground uppercase tracking-[0.2em] mb-4 pl-2">Premium Insights</h3>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Card 1: Persona (Animation: Slow Continuous Spin) -->
+      <div class="bg-surface/40 backdrop-blur-sm border border-border p-4 rounded-[1.5rem] flex flex-col shadow-sm relative overflow-hidden group">
+        <svg class="absolute -right-4 -bottom-4 w-28 h-28 text-primary/5 z-0 pointer-events-none " fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+        </svg>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/10 rounded-full blur-xl group-hover:bg-primary/20 transition-all z-0"></div>
+        <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1 z-10">Persona</span>
+        <span class="text-sm md:text-lg font-black text-foreground z-10 truncate">{{ premiumStats()?.persona }}</span>
+      </div>
+
+      <!-- Card 2: Total Hours (Animation: Slow Breathing Pulse) -->
+      <div class="bg-surface/40 backdrop-blur-sm border border-border p-4 rounded-[1.5rem] flex flex-col shadow-sm relative overflow-hidden group">
+        <svg class="absolute -right-1 -bottom-1 w-20 h-20 text-accent/5 z-0 pointer-events-none " fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-accent/10 rounded-full blur-xl group-hover:bg-accent/20 transition-all z-0"></div>
+        <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1 z-10">Total Time</span>
+        <div class="flex items-baseline gap-1 z-10">
+          <span class="text-xl md:text-2xl font-black text-foreground">{{ premiumStats()?.totalHours }}</span>
+          <span class="text-xs font-bold text-muted">Hrs</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Avg Session (Animation: Pendulum Rocking Spin) -->
+      <div class="bg-surface/40 backdrop-blur-sm border border-border p-4 rounded-[1.5rem] flex flex-col shadow-sm relative overflow-hidden group">
+        <svg class="absolute -right-1 -bottom-1 w-20 h-20 text-info/5 z-0 pointer-events-none " fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11.99 2.01l-1.41 1.41m8.49 1.41l1.41-1.41M12 22a10 10 0 100-20 10 10 0 000 20z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2" />
+        </svg>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-info/10 rounded-full blur-xl group-hover:bg-info/20 transition-all z-0"></div>
+        <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1 z-10">Avg Session</span>
+        <div class="flex items-baseline gap-1 z-10">
+          <span class="text-xl md:text-2xl font-black text-foreground">{{ premiumStats()?.avgSession }}</span>
+          <span class="text-xs font-bold text-muted">Mins</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Favorite Day (Animation: Smooth Float/Bounce) -->
+      <div class="bg-surface/40 backdrop-blur-sm border border-border p-4 rounded-[1.5rem] flex flex-col shadow-sm relative overflow-hidden group">
+        <svg class="absolute -right-1 -bottom-3 w-18 h-18 text-secondary/5 z-0 pointer-events-none [animation:bounce_60s_ease-in-out_infinite]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5M12 15h.01" />
+        </svg>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-secondary/10 rounded-full blur-xl group-hover:bg-success/20 transition-all z-0"></div>
+        <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1 z-10">Best Day</span>
+        <span class="text-sm md:text-lg font-black text-foreground z-10">{{ premiumStats()?.favoriteDay }}</span>
+      </div>
+
+      <!-- Card 5: Consistency Score (Animation: Slow Reverse Spin) -->
+      <div class="bg-surface/40 backdrop-blur-sm border border-border p-4 rounded-[1.5rem] flex flex-col shadow-sm relative overflow-hidden group">
+        <svg class="absolute -right-1 -bottom-0 w-18 h-18 text-warning/5 z-0 pointer-events-none [animation:spin_60s_linear_infinite_reverse]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+        </svg>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-warning/10 rounded-full blur-xl group-hover:bg-warning/20 transition-all z-0"></div>
+        <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1 z-10">Consistency</span>
+        <div class="flex items-baseline gap-1 z-10">
+          <span class="text-xl md:text-2xl font-black text-foreground">{{ premiumStats()?.consistencyScore }}</span>
+          <span class="text-xs font-bold text-muted">%</span>
+        </div>
+      </div>
+
+      <!-- Card 6: Weekly Average (Animation: Alternating Pulse) -->
+      <div class="bg-surface/40 backdrop-blur-sm border border-border p-4 rounded-[1.5rem] flex flex-col shadow-sm relative overflow-hidden group">
+        <svg class="absolute -right-0 -bottom-0 w-18 h-18 text-success/5 z-0 pointer-events-none " fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+        </svg>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-success/10 rounded-full blur-xl group-hover:bg-danger/20 transition-all z-0"></div>
+        <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1 z-10">Weekly Avg</span>
+        <div class="flex items-baseline gap-1 z-10">
+          <span class="text-xl md:text-2xl font-black text-foreground">{{ premiumStats()?.weeklyAverage }}</span>
+          <span class="text-xs font-bold text-muted">Days/Wk</span>
+        </div>
+      </div>
+
+      <!-- Card 7: Rest Days (Animation: Gentle Floating Moon) -->
+      <div class="bg-surface/40 backdrop-blur-sm border border-border p-4 rounded-[1.5rem] flex flex-col shadow-sm relative overflow-hidden group">
+        <svg class="absolute -right-4 -bottom-4 w-28 h-28 text-info/5 z-0 pointer-events-none " fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+        </svg>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-info/10 rounded-full blur-xl group-hover:bg-secondary/20 transition-all z-0"></div>
+        <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1 z-10">Rest Days</span>
+        <div class="flex items-baseline gap-1 z-10">
+          <span class="text-xl md:text-2xl font-black text-foreground">{{ premiumStats()?.restDays }}</span>
+          <span class="text-xs font-bold text-muted">Days</span>
+        </div>
+      </div>
+
+      <!-- Card 8: Longest Workout (Animation: Heartbeat Ping) -->
+      <div class="bg-surface/40 backdrop-blur-sm border border-border p-4 rounded-[1.5rem] flex flex-col shadow-sm relative overflow-hidden group">
+        <svg class="absolute -right-1 -bottom-1 w-18 h-18 text-danger/5 z-0 pointer-events-none " fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z" />
+        </svg>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-danger/10 rounded-full blur-xl group-hover:bg-primary/20 transition-all z-0"></div>
+        <span class="text-[10px] font-black text-muted uppercase tracking-widest mb-1 z-10">Longest Workout</span>
+        <span class="text-lg md:text-xl font-black text-foreground z-10">{{ premiumStats()?.longestSessionDisplay }}</span>
+      </div>
+
+    </div>
+  </div>
+  }
+
+  <div class="w-full max-w-5xl mx-auto mb-8">
+    <h2 class="text-2xl font-black text-foreground mb-6 pl-2">Session History</h2>
+
+    <div class="flex flex-col gap-4 w-full">
+      @for (record of paginatedRecords(); track record.id) {
+      <div class="group relative w-full flex items-stretch p-4 md:p-5 rounded-[1.5rem] bg-surface/40 backdrop-blur-md border border-foreground/10 hover:bg-surface/80 hover:border-primary/30 transition-all shadow-sm overflow-hidden">
+        
+        <svg class="absolute -right-4 -bottom-4 w-28 h-28 text-primary opacity-[0.03] group-hover:opacity-[0.06] transition-opacity pointer-events-none transform -rotate-12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2z"/></svg>
+
+        <div class="flex items-center gap-4 md:gap-6 w-full z-10">
+          
+          <div class="flex flex-col items-center justify-center w-14 h-16 rounded-[1rem]  border border-border/40  shadow-[inset_0_0_8px_1px_theme(colors.accent)] flex-shrink-0">
+            <span class="text-[9px] font-black text-muted uppercase mt-0.5">{{ record.attendance_date | date:'MMM' }}</span>
+            <span class="text-xl font-black text-foreground leading-none">{{ record.attendance_date | date:'dd' }}</span>
+          </div>
+          
+          <div class="flex flex-col flex-grow">
+            <h4 class="text-base font-black text-foreground">{{ record.attendance_date | date:'EEEE' }}</h4>
+            
+            <div class="mt-1">
+              <span class="text-[10px] md:text-xs font-extrabold text-foreground tracking-wide uppercase bg-background/50 px-2.5 py-1 rounded-full border border-secondary/30 inline-block">
+                {{ record.check_in_time | date:'h:mm a' }} 
+                <span class="text-muted/60 mx-1.5 font-normal">→</span> 
+                <span [ngClass]="record.check_out_time ? 'text-foreground' : 'text-success animate-pulse drop-shadow-[0_0_3px_rgba(34,197,94,0.5)]'">
+                  {{ record.check_out_time ? (record.check_out_time | date:'h:mm a') : 'Ongoing' }}
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-end text-right flex-shrink-0 pl-2 border-l border-border/30">
+            <span class="text-[10px] font-black text-muted uppercase tracking-widest">Duration</span>
+            <span class="text-lg md:text-xl font-black bg-clip-text text-transparent bg-gradient-to-br from-primary to-accent">{{ getDurationDisplay(record.check_in_time, record.check_out_time) }}</span>
+          </div>
+
+        </div>
+      </div>
+      } @empty {
+      <div class="w-full bg-surface/30 backdrop-blur-sm border border-border/30 border-dashed rounded-[2rem] py-12 flex flex-col items-center justify-center text-muted">
+        <svg class="w-10 h-10 opacity-20 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4M12 20V4"/></svg>
+        <p class="text-sm font-bold text-foreground">No sessions in this timeframe.</p>
+      </div>
+      }
+    </div>
+  </div>
+
+  @if (totalItems() > 0) {
+  <div class="w-full max-w-5xl mx-auto flex items-center justify-between px-1">
+    
+    <div class="h-9 px-4 flex items-center bg-surface border border-white/10 dark:border-white/5 rounded-full shadow-sm backdrop-blur-md">
+      <span class="text-xs font-black text-muted">{{ paginatedStart() }} - {{ paginatedEnd() }} <span class="font-bold mx-0.5">/</span> {{ totalItems() }}</span>
+    </div>
+
+    <div class="h-9 px-1 flex items-center bg-surface border border-white/10 dark:border-white/5 rounded-full shadow-sm backdrop-blur-md">
+      <button (click)="prevPage()" [disabled]="currentPage() === 1" class="w-7 h-7 rounded-full flex items-center justify-center text-foreground hover:bg-background disabled:opacity-20 transition-all">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      
+      <span class="text-xs font-black text-foreground min-w-[2rem] text-center">{{ currentPage() }}</span>
+      
+      <button (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="w-7 h-7 rounded-full flex items-center justify-center text-foreground hover:bg-background disabled:opacity-20 transition-all">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+
+  </div>
+  }
+
+  }
+</div>

@@ -1,0 +1,447 @@
+@if (isDataReady() && selectedPlan(); as plan) {
+<div class="relative h-full bg-background text-foreground font-sans mb-2! lg:mb-4 transition-colors duration-300">
+
+  <div class="absolute inset-0 pointer-events-none z-0 opacity-[0.03]">
+    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="1.5" />
+          <circle cx="40" cy="40" r="2" fill="currentColor" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid)" />
+    </svg>
+  </div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 pt-8 lg:pt-16">
+
+    <header class="flex items-center justify-between mb-10">
+      <button (click)="goBack()"
+        class="group flex items-center justify-center w-10 h-10 rounded-full border border-border bg-surface/50 backdrop-blur-md hover:border-primary transition-all focus:outline-none">
+        <svg class="w-4 h-4 text-muted group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <span class="text-[10px] font-bold uppercase tracking-[0.25em] text-foreground">Membership Checkout</span>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+
+      <div class="lg:col-span-6 flex flex-col items-center w-full lg:sticky lg:top-12">
+        <div
+          class="w-full max-w-[400px] mx-auto bg-gradient-to-br from-surface/90 to-surface/40 backdrop-blur-2xl border border-primary/15 shadow-2xl shadow-primary/20 rounded-[2rem] overflow-hidden group transition-all duration-500">
+
+          <div class="relative w-full aspect-[1.7/1] flex flex-col justify-between overflow-hidden">
+            <img src="assets/gym_logo_transperant.png"
+              class="absolute -right-6 -bottom-6 w-56 h-56 object-contain opacity-[0.06] dark:opacity-[0.10] mix-blend-luminosity group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+              alt="Gym Theme" />
+            <div
+              class="absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-card-shine z-20 pointer-events-none">
+            </div>
+
+            <div class="relative z-10 p-6 sm:p-8 flex flex-col justify-between h-full">
+              <div class="flex justify-between items-start">
+                <div
+                  class="w-10 h-10 rounded-full bg-background/50 backdrop-blur-sm border border-border flex items-center justify-center overflow-hidden shadow-inner">
+                  <img src="assets/gym_logo_transperant.png" class="w-full h-full object-cover" alt="Logo" />
+                </div>
+                <span
+                  class="px-3 py-1 rounded-full bg-background/40 backdrop-blur border border-border text-[9px] font-bold uppercase tracking-widest text-primary shadow-sm">
+                  {{ plan.plan_price.name }}
+                </span>
+              </div>
+
+              <div class="mt-auto mb-3">
+                <h2
+                  class="text-3xl sm:text-4xl font-bold tracking-tight text-foreground uppercase truncate drop-shadow-md">
+                  {{ plan.name }}</h2>
+              </div>
+
+              <div class="flex justify-between items-end">
+                <div>
+                  <p class="text-[8px] font-bold uppercase tracking-[0.2em] text-muted mb-1">Duration</p>
+                  <div class="flex items-center gap-1.5 text-primary">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-xs font-foreground tracking-widest">{{ plan.plan_price.duration_in_days }} DAYS</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-[8px] font-bold uppercase tracking-[0.2em] text-muted mb-0.5">Value</p>
+                  <p class="text-xl font-bold tracking-tighter text-foreground drop-shadow-md">₹{{ plan.plan_price.price
+                    }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative z-10 bg-background/20 backdrop-blur-md">
+            <button (click)="toggleFeatures()"
+              class="w-full border-t border-accent/10 py-4 flex items-center justify-center gap-2 transition-colors focus:outline-none">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-foreground">{{ isFeaturesExpanded() ?
+                'Hide Benefits' : 'View Benefits' }}</span>
+              <svg class="w-4 h-4 text-primary transition-transform duration-300"
+                [class.rotate-180]="isFeaturesExpanded()" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <div class="overflow-hidden transition-all duration-300 ease-in-out"
+              [style.maxHeight]="isFeaturesExpanded() ? '400px' : '0px'">
+              <div class="p-5 border-t border-border/20 border-dashed">
+                <ul class="grid grid-cols-2 gap-x-4 gap-y-4">
+                  @for (feature of plan.plan_features; track feature) {
+                  <li class="flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    <span class="text-xs font-bold text-foreground leading-tight">{{ feature }}</span>
+                  </li>
+                  }
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 w-full flex flex-col items-center lg:items-start">
+        <div class="w-full max-w-md space-y-6">
+
+          <div class="w-full">
+            @if (isCouponApplied() && couponDetails(); as details) {
+            <div
+              class="bg-success/5 backdrop-blur-md border border-success/30 rounded-3xl p-5 shadow-sm animate-in fade-in transition-all relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 w-16 h-16 bg-success/10 rounded-full blur-xl pointer-events-none">
+              </div>
+
+              <div class="flex items-center justify-between mb-3 relative z-10">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-success/20 flex items-center justify-center shrink-0">
+                    <svg class="w-3.5 h-3.5 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                      stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span class="text-sm font-bold text-success uppercase tracking-widest">{{ couponCode() }}
+                    APPLIED</span>
+                </div>
+                <button (click)="removeCoupon()"
+                  class="text-[10px] font-bold text-muted hover:text-danger uppercase tracking-widest transition-colors focus:outline-none">Remove</button>
+              </div>
+
+              <div class="bg-background/60 rounded-xl p-3 border border-border/50 relative z-10">
+                <p class="text-xs text-foreground font-medium flex justify-between items-center">
+                  <span>Total Savings</span>
+                  <span class="font-bold text-success text-base">₹{{ details.discount_amount }}</span>
+                </p>
+
+                @if(limitWarningMessage()) {
+                <div class="mt-3 pt-3 border-t border-border/50 flex items-start gap-2">
+                  <svg class="w-4 h-4 text-warning shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-warning leading-normal">{{
+                    limitWarningMessage() }}</p>
+                </div>
+                }
+              </div>
+            </div>
+            } @else {
+            <div
+              class="bg-surface/50 backdrop-blur-md border border-border rounded-full p-2 shadow-sm transition-all relative">
+              <div class="relative flex items-center w-full">
+                <input type="text" [(ngModel)]="couponCode" placeholder="Have a Promo Code?"
+                  class="w-full bg-transparent pl-6 pr-32 py-3 text-xs font-bold uppercase tracking-widest text-foreground placeholder:text-muted focus:outline-none transition-colors"
+                  [disabled]="isCouponApplying()">
+
+                <button (click)="applyCoupon()" [disabled]="!couponCode() || isCouponApplying()"
+                  class="absolute right-1 top-1 bottom-1 bg-foreground text-background px-6 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-fg disabled:opacity-30 transition-all shadow-md flex items-center justify-center gap-1.5 min-w-[80px]">
+                  @if (isCouponApplying()) {
+                  <span
+                    class="w-3.5 h-3.5 border-2 border-background/30 border-t-background rounded-full animate-spin"></span>
+                  WAIT
+                  } @else {
+                  APPLY
+                  }
+                </button>
+              </div>
+            </div>
+
+            @if (couponError()) {
+            <p
+              class="text-danger text-[10px] font-bold uppercase tracking-widest mt-2 px-4 flex items-start gap-1.5 animate-in fade-in">
+              <svg class="w-3.5 h-3.5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span class="leading-normal">{{ couponError() }}</span>
+            </p>
+            }
+            }
+          </div>
+
+          @if (availableCoins() >= 2) {
+          <div
+            class="bg-surface/50 backdrop-blur-md border border-border rounded-[1.5rem] p-4 shadow-sm transition-all duration-300 {{ isCoinsApplied() ? 'ring-1 ring-[#fbbf24]/50 bg-[#fbbf24]/5' : '' }}">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-warning/60 flex items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.2),0_0_20px_var(--warning)] shrink-0">
+                  <span class="text-2xl leading-none">🪙</span>
+                </div>
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-widest text-foreground">Coin Balance: {{
+                    availableCoins() }}</p>
+                  <p class="text-[9px] font-bold text-muted uppercase tracking-wider mt-0.5">Use coins to save ₹{{
+                    availableCoins() / 2 }}</p>
+                </div>
+              </div>
+              <button (click)="toggleCoins()"
+                class="px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm {{ isCoinsApplied() ? 'bg-danger/10 text-danger hover:bg-danger/20' : 'bg-foreground text-background hover:bg-[#fbbf24] hover:text-black' }}">
+                {{ isCoinsApplied() ? 'Remove' : 'Apply' }}
+              </button>
+            </div>
+          </div>
+          }
+
+          <div class="bg-surface/80 backdrop-blur-md border border-border rounded-3xl p-6 shadow-sm">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-muted mb-4 text-center">Select Payment Plan
+            </p>
+
+            <div
+              class="grid gap-2 bg-background border border-border p-1.5 rounded-full {{ isSplitAllowed() ? 'grid-cols-2' : 'grid-cols-1' }}">
+              <button (click)="setPaymentMode('FULL')"
+                class="py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all {{ paymentMode() === 'FULL' ? 'bg-foreground text-background shadow-md' : 'text-foreground hover:bg-surface' }}">
+                Pay Full
+              </button>
+
+              @if (isSplitAllowed()) {
+              <button (click)="setPaymentMode('SPLIT')"
+                class="py-3 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all {{ paymentMode() === 'SPLIT' ? 'bg-foreground text-background shadow-md' : 'text-foreground hover:bg-surface' }}">
+                2-Step Payment
+              </button>
+              }
+            </div>
+
+            @if(paymentMode() === 'SPLIT') {
+            <div
+              class="mt-4 p-3 bg-success/10 text-danger rounded-2xl border border-success/20 animate-in fade-in flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-triangle-alert-icon lucide-triangle-alert">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+                <path d="M12 9v4" />
+                <path d="M12 17h.01" />
+              </svg>
+              <p
+                class="block text-[10px] font-bold text-success text-start uppercase tracking-widest flex items-start justify-start gap-2">
+                Pay ₹{{ totalDue() }} now. Remaining balance of ₹{{ secondInstallmentAmount() }} due in 30 days.
+              </p>
+            </div>
+            }
+          </div>
+
+          <div class="bg-surface/50 backdrop-blur-md border border-border rounded-3xl p-6 sm:p-8 shadow-sm">
+            <div class="space-y-4">
+
+              <div class="flex justify-between items-center text-sm">
+                <div class="flex items-center gap-2 text-muted font-bold uppercase tracking-widest text-[11px]">
+                  <svg class="w-4 h-4 text-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                  Base Installment {{ paymentMode() === 'SPLIT' ? '(Step 1)' : '' }}
+                </div>
+                <span class="font-bold text-foreground">₹{{ paymentMode() === 'SPLIT' ? baseInstallment1() : subtotal()
+                  }}</span>
+              </div>
+
+              @if (isCouponApplied() && couponDetails(); as details) {
+              <div class="flex justify-between items-center text-sm py-1">
+                <div class="flex flex-col gap-0.5">
+                  <div class="flex items-center gap-2 font-bold uppercase tracking-widest text-[11px] text-success">
+                    <svg class="w-4 h-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                      stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                    Coupon ({{ couponCode() }})
+                  </div>
+                  <span class="text-[9px] font-bold uppercase tracking-widest text-muted pl-6">
+                    {{ couponDescription() }} </span>
+                </div>
+                <span class="font-bold text-success">-₹{{ discountAmount() }}</span>
+              </div>
+              }
+
+              <div class="flex justify-between items-center text-sm py-1" [class.hidden]="!isCoinsApplied()">
+                <div class="flex items-center gap-2 font-bold uppercase tracking-widest text-[11px] text-[#fbbf24]">
+                  <svg class="w-4 h-4 text-[#fbbf24]" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Coins Used ({{ availableCoins() }})
+                </div>
+                <span class="font-bold text-[#fbbf24]">-₹{{ coinDiscount() }}</span>
+              </div>
+
+              <div class="flex justify-between items-center text-sm" [class.opacity-40]="taxAmount() === 0">
+                <div class="flex items-center gap-2 text-muted font-bold uppercase tracking-widest text-[11px]">
+                  <svg class="w-4 h-4 text-foreground/40" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5-2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
+                  </svg>
+                  Estimated Tax
+                </div>
+                <span class="font-bold text-foreground">₹{{ taxAmount() }}</span>
+              </div>
+
+              <div class="flex justify-between items-end pt-5 mt-3 border-t border-border">
+                <div
+                  class="flex items-center gap-2 text-foreground font-bold uppercase tracking-widest text-[12px] mb-1">
+                  <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                    stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  Total Due Now
+                </div>
+                <span class="text-4xl font-bold tracking-tighter text-foreground">₹{{ totalDue() }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-surface/80 backdrop-blur-xl border border-border rounded-3xl p-6 mb-4 sm:p-8 shadow-sm">
+            <div [class.hidden]="isPaymentInitiated()">
+              <div class="flex flex-col items-center gap-6">
+
+                <div class="shrink-0 flex flex-col items-center justify-center">
+                  <div class="bg-background rounded-2xl shadow-[0_10px_40px_-10px_var(--primary)] overflow-hidden mb-5">
+                    <div #qrCanvas
+                      class="w-[280px] h-[280px] flex items-center justify-center [&>svg]:w-full [&>svg]:h-full transition-opacity duration-300">
+                    </div>
+                  </div>
+
+                  <div class="text-center">
+                    <p
+                      class="text-[12px] font-bold text-foreground uppercase tracking-[0.2em] mb-1 flex items-center justify-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="3">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {{ bankAccountName() }}
+                    </p>
+
+                    <div class="flex items-center justify-center gap-2">
+                      <p class="text-sm font-bold text-muted tracking-widest lowercase">{{ adminUpiId() }}</p>
+
+                      <button (click)="copyUpiId()"
+                        class="text-muted hover:text-primary transition-colors focus:outline-none" title="Copy UPI ID"
+                        aria-label="Copy UPI ID">
+
+                        @if (isCopied()) {
+                        <svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                          stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        } @else {
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        }
+
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="w-full">
+                  <div class="block lg:hidden">
+                    <button (click)="openUpiApp()"
+                      class="w-full bg-primary text-primary-fg py-4.5 rounded-full text-sm font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all">
+                      Pay via App
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </button>
+                    <div class="flex items-center gap-4 my-4 opacity-50">
+                      <div class="h-px bg-border flex-1"></div>
+                      <span class="text-[9px] font-bold text-foreground uppercase">OR</span>
+                      <div class="h-px bg-border flex-1"></div>
+                    </div>
+                  </div>
+
+                  <button (click)="isPaymentInitiated.set(true)"
+                    class="w-full bg-background border border-border text-foreground py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] hover:border-primary hover:text-primary transition-all shadow-sm">
+                    Enter Transaction UTR
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div [class.hidden]="!isPaymentInitiated()" class="animate-in slide-in-from-bottom-2 duration-300">
+              <div class="space-y-4">
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-muted text-center">Paste
+                  12-Digit Reference Number</label>
+
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                      stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <input type="text" [(ngModel)]="transactionId" placeholder="UTR NUMBER"
+                    class="w-full bg-background border border-border rounded-full pl-14 pr-6 py-4 text-center text-lg font-bold uppercase tracking-[0.1em] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+                </div>
+
+                <div class="flex flex-col gap-3 mt-6">
+                  <button (click)="confirmPayment()" [disabled]="isProcessing() || transactionId().length < 8"
+                    class="w-full bg-primary text-primary-fg py-4 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40 disabled:hover:translate-y-0 transition-all">
+                    @if (isProcessing()) {
+                    <span
+                      class="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin"></span>
+                    Verifying
+                    } @else {
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Submit Verification
+                    }
+                  </button>
+                  <button (click)="isPaymentInitiated.set(false)"
+                    class="w-full py-4 rounded-full text-[10px] font-bold text-foreground hover:bg-background border border-transparent hover:border-border uppercase tracking-[0.2em] transition-colors text-center">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+} @else {
+<div class="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+  <div class="w-10 h-10 border-2 border-border border-t-primary rounded-full animate-spin"></div>
+  <span class="text-[10px] font-bold uppercase tracking-widest text-muted">Establishing Secure Connection</span>
+</div>
+}

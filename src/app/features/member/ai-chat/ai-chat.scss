@@ -1,0 +1,123 @@
+/* --- HIGH-END SWEEPING AI FOG --- */
+.ai-fog-container {
+  position: relative;
+}
+
+.ai-fog-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  
+  /* Drastically increased size for a wider glow */
+  width: 250%;
+  height: 250%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  z-index: 10;
+  pointer-events: none;
+  
+  /* Creates angular beams of light instead of a flat circle */
+  background: conic-gradient(
+    from 0deg, 
+    transparent 0%, 
+    var(--primary) 25%, 
+    transparent 50%, 
+    var(--primary) 75%, 
+    transparent 100%
+  );
+  
+  /* Fades the edges perfectly into the background */
+  mask-image: radial-gradient(circle, black 20%, transparent 60%);
+  -webkit-mask-image: radial-gradient(circle, black 20%, transparent 60%);
+  
+  filter: blur(12px);
+  opacity: 0.6; /* Much brighter baseline */
+  
+  /* Constant smooth rotation */
+  animation: radar-spin 6s linear infinite;
+}
+
+/* When generating, it spins faster and glows at maximum brightness */
+.ai-fog-container.thinking .ai-fog-layer {
+  opacity: 1;
+  filter: blur(16px);
+  width: 300%;
+  height: 300%;
+  animation: radar-spin 2s linear infinite;
+}
+
+@keyframes radar-spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+
+/* --- THE REAL AI CURSOR --- */
+.ai-typing-cursor::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 14px;
+  background-color: var(--primary);
+  border-radius: 2px;
+  margin-left: 4px;
+  vertical-align: middle;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Scrollbars */
+textarea.custom-scrollbar {
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+  &::-webkit-scrollbar { display: none; }
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  &::-webkit-scrollbar { width: 4px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: var(--radius);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Clean Markdown Formatting */
+::ng-deep .format-content {
+  strong { font-weight: 600; }
+  h2, h3 { font-weight: 600; font-size: 1.05em; }
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  li { padding-left: 0.2rem; }
+  br + br {
+    display: block;
+    content: "";
+    margin-top: 0.35rem; 
+  }
+}
+
+  /* The custom premium breathing animation */
+  @keyframes premium-breathe {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.03); opacity: 1; }
+  }
+  .animate-breathing {
+    animation: premium-breathe 2.5s ease-in-out infinite;
+  }

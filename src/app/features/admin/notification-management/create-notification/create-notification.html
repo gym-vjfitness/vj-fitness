@@ -1,0 +1,201 @@
+<div class="h-full bg-background text-foreground pb-4 font-sans selection:bg-primary/20 relative overflow-x-hidden">
+  <div class="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none z-0"></div>
+
+  <!-- Back Button -->
+  <button type="button" (click)="goBack()" class="absolute top-6 right-4 sm:right-6 flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-surface/80 backdrop-blur-md border border-border/60 hover:bg-background hover:border-primary/40 text-muted hover:text-primary transition-all shadow-sm cursor-pointer group z-50">
+    <svg class="w-4 h-4 mr-1.5 sm:mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    <span class="font-bold text-xs sm:text-sm tracking-wide">Back</span>
+  </button>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 relative z-10 pt-8 md:pt-12">
+    
+    <header class="mb-12 text-center mt-6 sm:mt-0">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-[1.5rem] bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30 mb-6 transform -rotate-6 hover:rotate-0 transition-transform duration-300">
+        <svg class="w-7 h-7 text-primary-fg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+        {{ isEditMode() ? 'Edit Announcement' : 'New Announcement' }}
+      </h1>
+    </header>
+
+    @if (isFetchingData()) {
+      <div class="flex flex-col items-center justify-center py-20 animate-in fade-in text-muted">
+        <svg class="animate-spin h-10 w-10 text-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <span class="text-sm font-medium">Loading details...</span>
+      </div>
+    } @else {
+      <form [formGroup]="notificationForm" class="space-y-6 animate-in fade-in duration-500">
+
+        <!-- TITLE -->
+        <div class="relative w-full flex items-center justify-between bg-surface/40 border border-border/50 rounded-full px-7 py-3.5 cursor-text hover:border-primary/50 transition-colors focus-within:border-primary shadow-sm overflow-hidden group">
+          <div class="flex flex-col w-full relative z-10">
+            <label class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-widest mb-0.5">Headline</label>
+            <input type="text" formControlName="title" placeholder="e.g., Summer Offer 50% Off" class="w-full bg-transparent border-none p-0 text-base sm:text-lg font-bold text-foreground focus:ring-0 outline-none placeholder:text-muted/40 transition-all">
+          </div>
+        </div>
+
+        <!-- ROW 1: TYPE & CATEGORY -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- TYPE DROPDOWN (PREMIUM) -->
+          <div class="custom-dropdown relative w-full group" [class.z-40]="isTypeDropdownOpen()">
+            <div (click)="toggleDropdown('type', $event)" [class.border-primary]="isTypeDropdownOpen()" class="relative w-full flex items-center justify-between bg-surface/40 border border-border/50 rounded-full px-7 py-3.5 cursor-pointer hover:border-primary/50 transition-colors shadow-sm overflow-hidden">
+              <div class="flex flex-col w-full relative z-10">
+                <label class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-widest mb-0.5 cursor-pointer">Type</label>
+                <div class="text-base sm:text-lg font-bold text-foreground capitalize">{{ notificationForm.get('type')?.value }}</div>
+              </div>
+              <svg [class.rotate-180]="isTypeDropdownOpen()" class="w-5 h-5 text-muted transition-transform relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            
+            @if (isTypeDropdownOpen()) {
+              <div class="absolute top-[105%] left-0 w-full  bg-surface/95 backdrop-blur-3xl border border-border/50 rounded-3xl shadow-2xl z-50 py-3 flex flex-col gap-1 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                @for (opt of types; track opt.value) {
+                  <div (click)="selectOption('type', opt.value, $event)" class="flex items-center gap-4 px-6 py-3 mx-2 rounded-[1rem] hover:bg-background/80 cursor-pointer transition-colors group/item">
+                    <svg class="w-5 h-5 {{opt.colorClass}}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" [attr.d]="opt.iconPath"/></svg>
+                    <span class="text-xs sm:text-sm font-black uppercase tracking-widest text-foreground group-hover/item:text-primary transition-colors">{{ opt.label }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- CATEGORY DROPDOWN (PREMIUM) -->
+          <div class="custom-dropdown relative w-full group" [class.z-40]="isCategoryDropdownOpen()">
+            <div (click)="toggleDropdown('category', $event)" [class.border-primary]="isCategoryDropdownOpen()" class="relative w-full flex items-center justify-between bg-surface/40 border border-border/50 rounded-full px-7 py-3.5 cursor-pointer hover:border-primary/50 transition-colors shadow-sm overflow-hidden">
+              <div class="flex flex-col w-full relative z-10">
+                <label class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-widest mb-0.5 cursor-pointer">Category Map</label>
+                <div class="text-base sm:text-lg font-bold text-foreground capitalize">{{ notificationForm.get('category')?.value }}</div>
+              </div>
+              <svg [class.rotate-180]="isCategoryDropdownOpen()" class="w-5 h-5 text-muted transition-transform relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            
+            @if (isCategoryDropdownOpen()) {
+              <div class="absolute top-[105%] left-0 w-full  bg-surface/95 backdrop-blur-3xl border border-border/50 rounded-3xl shadow-2xl z-50 py-3 flex flex-col gap-1 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                @for (opt of categories; track opt.value) {
+                  <div (click)="selectOption('category', opt.value, $event)" class="flex items-center gap-4 px-6 py-3 mx-2 rounded-[1rem] hover:bg-background/80 cursor-pointer transition-colors group/item">
+                    <svg class="w-5 h-5 {{opt.colorClass}}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" [attr.d]="opt.iconPath"/></svg>
+                    <span class="text-xs sm:text-sm font-black uppercase tracking-widest text-foreground group-hover/item:text-primary transition-colors">{{ opt.label }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ROW 2: PRIORITY & DATES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+          
+          <!-- PRIORITY DROPDOWN (PREMIUM) -->
+          <div class="custom-dropdown relative w-full group" [class.z-40]="isPriorityDropdownOpen()">
+            <div (click)="toggleDropdown('priority', $event)" [class.border-primary]="isPriorityDropdownOpen()" class="relative w-full flex items-center justify-between bg-surface/40 border border-border/50 rounded-full px-7 py-3.5 cursor-pointer hover:border-primary/50 transition-colors shadow-sm overflow-hidden">
+              <div class="flex flex-col w-full relative z-10">
+                <label class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-widest mb-0.5 cursor-pointer">Priority Level</label>
+                <div class="text-base sm:text-lg font-bold text-foreground capitalize">{{ notificationForm.get('priority')?.value }}</div>
+              </div>
+              <svg [class.rotate-180]="isPriorityDropdownOpen()" class="w-5 h-5 text-muted transition-transform relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            
+            @if (isPriorityDropdownOpen()) {
+              <div class="absolute top-[105%] left-0 w-full  bg-surface/95 backdrop-blur-3xl border border-border/50 rounded-3xl shadow-2xl z-50 py-3 flex flex-col gap-1 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                @for (opt of priorities; track opt.value) {
+                  <div (click)="selectOption('priority', opt.value, $event)" class="flex items-center gap-4 px-6 py-3 mx-2 rounded-[1rem] hover:bg-background/80 cursor-pointer transition-colors group/item">
+                    <svg class="w-5 h-5 {{opt.colorClass}}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" [attr.d]="opt.iconPath"/></svg>
+                    <span class="text-xs sm:text-sm font-black uppercase tracking-widest text-foreground group-hover/item:text-primary transition-colors">{{ opt.label }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- DATES TRIGGER (Unified Dual-Date Trigger) -->
+          <div (click)="toggleDatePicker($event)" [class.border-primary]="showDatePicker()" class="relative w-full flex items-center justify-between bg-surface/40 border border-border/50 rounded-full px-7 py-3.5 cursor-pointer hover:border-primary/50 transition-colors shadow-sm overflow-hidden group">
+            <div class="flex flex-col w-full relative z-10">
+              <label class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-widest mb-0.5 cursor-pointer">Duration</label>
+              <div class="text-sm sm:text-base font-bold text-foreground">
+                {{ startDate() ? (startDate() | date:'MMM d, yyyy') : 'Start Date' }}
+                <span class="text-muted font-normal mx-1">→</span>
+                {{ endDate() ? (endDate() | date:'MMM d, yyyy') : 'End Date' }}
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-muted transition-transform relative z-10 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            
+            @if (startDate() || endDate()) {
+              <div (click)="clearDateSelection($event)" class="absolute right-14 z-20 p-2 rounded-full hover:bg-border/80 text-danger transition-colors cursor-pointer" title="Clear Dates">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- CONTENT TEXTAREA -->
+        <div class="relative w-full flex flex-col bg-surface/40 border border-border/50 rounded-[2rem] px-7 py-5 cursor-text hover:border-primary/50 transition-colors focus-within:border-primary shadow-sm overflow-hidden group">
+          <label class="text-[10px] sm:text-xs font-black text-muted uppercase tracking-widest mb-2">Description / Content</label>
+          <textarea formControlName="content" rows="4" placeholder="Enter the announcement details here..." class="w-full bg-transparent border-none p-0 text-sm sm:text-base font-bold text-foreground focus:ring-0 outline-none placeholder:text-muted/40 resize-y transition-all"></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-10 pt-8 border-t border-border/50 flex flex-col items-center">
+          <button type="button" (click)="saveNotification()" [disabled]="isLoading()" class="w-full md:w-auto min-w-[280px] bg-foreground text-background hover:bg-primary hover:text-primary-fg px-8 py-4 rounded-full font-extrabold text-sm shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+            @if (isLoading()) {
+              <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Saving...
+            } @else {
+              {{ isEditMode() ? 'Update Announcement' : 'Save Announcement' }}
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            }
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- DATE PICKER MODAL OVERLAY (Issue 1 Fixed) -->
+<!-- ========================================== -->
+@if (showDatePicker()) {
+  <div class="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" (click)="showDatePicker.set(false)">
+    
+    <!-- Modal Card -->
+    <div (click)="$event.stopPropagation()" class="w-full max-w-sm bg-surface border border-border/50 rounded-[2rem] p-6 shadow-2xl relative animate-in zoom-in-95 duration-200">
+      
+      <button type="button" (click)="showDatePicker.set(false)" class="absolute top-4 right-4 p-2 bg-background/50 hover:bg-border/60 rounded-full text-muted hover:text-foreground transition-colors cursor-pointer">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+
+      <div class="text-center mb-6">
+        <h3 class="text-lg font-extrabold text-foreground tracking-tight">Select Duration</h3>
+        <p class="text-[11px] font-bold text-muted uppercase tracking-widest mt-1">
+          {{ (!startDate()) ? 'Pick Start Date' : (!endDate()) ? 'Pick Expiry Date' : 'Selection Complete' }}
+        </p>
+      </div>
+
+      <div class="flex justify-between items-center bg-background/50 rounded-full px-4 py-2 mb-5 border border-border/50">
+        <button type="button" (click)="prevMonth($event)" class="text-muted hover:text-foreground rounded-full p-1 transition-colors cursor-pointer"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg></button>
+        <span class="text-xs font-black text-foreground uppercase tracking-[0.2em]">{{ months[calendarMonth()] }} {{ calendarYear() }}</span>
+        <button type="button" (click)="nextMonth($event)" class="text-muted hover:text-foreground rounded-full p-1 transition-colors cursor-pointer"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></button>
+      </div>
+
+      <div class="grid grid-cols-7 gap-1 mb-2">
+        @for (day of ['S','M','T','W','T','F','S']; track $index) { <div class="text-[11px] text-muted font-black text-center">{{day}}</div> }
+      </div>
+
+      <div class="grid grid-cols-7 gap-y-2 gap-x-1">
+        @for (date of calendarDays(); track $index) {
+          @if (date) {
+            <button type="button"
+              (click)="selectDate(date, $event)" 
+              [disabled]="isDateDisabled(date)"
+              [class]="'h-10 w-full rounded-full text-xs font-bold flex items-center justify-center transition-all ' + 
+                      (isDateSelected(date) ? 'bg-primary text-primary-fg shadow-md scale-105 ' : 
+                       isInRange(date) ? 'bg-primary/20 text-foreground rounded-none ' : 
+                       isDateDisabled(date) ? 'text-muted opacity-20 cursor-not-allowed ' : 
+                       'text-foreground hover:bg-border/80 cursor-pointer ')"
+            >
+              {{ date.getDate() }}
+            </button>
+          } @else { <div></div> }
+        }
+      </div>
+    </div>
+  </div>
+}

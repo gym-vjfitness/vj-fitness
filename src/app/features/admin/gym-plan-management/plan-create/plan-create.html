@@ -1,0 +1,220 @@
+<div class="h-full  bg-background text-foreground pb-4 font-sans selection:bg-primary/20 relative overflow-x-hidden ">
+  
+  <div class="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none z-0"></div>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 relative z-10 pt-8 md:pt-12">
+    
+    <!-- Top Right Back Button -->
+    <button type="button" (click)="goBack()" 
+      class="absolute top-8 right-4 sm:right-6 flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-surface/80 backdrop-blur-md border border-border/60 hover:bg-background hover:border-primary/40 text-muted hover:text-primary transition-all shadow-sm cursor-pointer group z-50">
+      <svg class="w-4 h-4 mr-1.5 sm:mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      <span class="font-bold text-xs sm:text-sm tracking-wide">Back</span>
+    </button>
+
+    <header class="mb-12 text-center mt-8 sm:mt-0">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-[2rem] bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30 mb-6 transform -rotate-6 hover:rotate-0 transition-transform duration-300">
+        <svg class="w-8 h-8 text-primary-fg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+        {{ isEditMode() ? 'Edit Plan' : 'Craft a Plan' }}
+      </h1>
+      <p class="text-muted mt-3 text-base md:text-lg">
+        {{ isEditMode() ? 'Update your existing membership offering.' : 'Design the perfect membership offering.' }}
+      </p>
+    </header>
+
+    @if (errorMessage()) {
+      <div class="bg-danger/10 text-danger px-6 py-4 rounded-3xl mb-8 flex items-center gap-4 animate-in fade-in slide-in-from-top-4">
+        <div class="p-2 bg-danger/20 rounded-full">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <span class="font-medium">{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (isFetchingData()) {
+      <div class="flex flex-col items-center justify-center py-20 animate-in fade-in">
+        <svg class="animate-spin h-10 w-10 text-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <p class="text-muted font-medium">Loading plan details...</p>
+      </div>
+    } @else {
+      <form [formGroup]="planForm" (ngSubmit)="onSubmit()" class="space-y-12 animate-in fade-in duration-500">
+        
+        <div class="space-y-6">
+          <h2 class="text-xs font-black tracking-[0.2em] text-secondary uppercase ml-4">01 — Identity</h2>
+          <div class="bg-surface/50 p-2 rounded-[2rem] border border-border/50 shadow-sm backdrop-blur-md relative z-10 focus-within:border-primary/50 transition-colors">
+            <input type="text" formControlName="name" placeholder="Plan Name (e.g., The Elite Pass)"
+              class="w-full bg-transparent border-0 outline-none focus:outline-none focus:ring-0 focus:border-transparent px-6 py-5 text-xl font-bold text-foreground placeholder:text-muted transition-all">
+            <div class="h-px bg-gradient-to-r from-transparent via-border to-transparent opacity-50"></div>
+            <textarea formControlName="description" rows="2" placeholder="Write a compelling pitch for this plan..."
+              class="w-full bg-transparent border-0 outline-none focus:outline-none focus:ring-0 focus:border-transparent px-6 py-5 text-base text-foreground placeholder:text-muted resize-none transition-all"></textarea>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="flex justify-between items-center ml-4">
+            <h2 class="text-xs font-black tracking-[0.2em] text-secondary uppercase">02 — Perks</h2>
+            @if (hasDuplicateFeatures) {
+              <span class="text-xs font-bold text-danger bg-danger/10 px-3 py-1 rounded-full animate-pulse">Duplicates found!</span>
+            }
+          </div>
+
+          <div formArrayName="features" class="space-y-3 relative z-10">
+            @for (featureCtrl of featuresControls; track $index) {
+              <div [formGroupName]="$index" class="flex items-center gap-3 group animate-in slide-in-from-left-2">
+                <div class="flex-grow relative">
+                  <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <input type="text" formControlName="name" placeholder="Add a feature..."
+                    class="w-full bg-surface border-2 border-transparent outline-none focus:outline-none focus:ring-0 focus:border-accent/30 rounded-full pl-12 pr-6 py-4 text-base text-foreground transition-all shadow-sm"
+                    [class.!border-danger]="hasDuplicateFeatures">
+                </div>
+                <button type="button" (click)="removeFeature($index)" [disabled]="featuresControls.length === 1"
+                  class="shrink-0 w-14 h-14 flex items-center justify-center text-muted hover:text-danger hover:bg-danger/10 rounded-full transition-all disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer disabled:cursor-not-allowed outline-none focus:outline-none">
+                  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+            }
+          </div>
+          
+          <button type="button" (click)="addFeature()" class="w-full border-2 border-dashed border-accent/30 text-accent hover:bg-accent/5 py-4 rounded-full text-sm font-bold tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer relative z-10 outline-none focus:outline-none">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Another Perk
+          </button>
+        </div>
+
+        <div class="space-y-6 relative">
+          <div class="flex justify-between items-center ml-4">
+            <h2 class="text-xs font-black tracking-[0.2em] text-secondary uppercase">03 — Pricing Architecture</h2>
+            @if (hasDuplicatePrices) {
+              <span class="text-xs font-bold text-danger bg-danger/10 px-3 py-1 rounded-full animate-pulse">Duplicate duration!</span>
+            }
+          </div>
+
+          <div formArrayName="prices" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            @for (priceCtrl of pricesControls; track $index; let priceIndex = $index) {
+              
+              <div [formGroupName]="priceIndex" 
+                   [style.z-index]="openDropdownIndex() === priceIndex ? 50 : 10"
+                   class="bg-surface rounded-3xl p-5 shadow-sm border border-transparent focus-within:border-primary/30 transition-all relative overflow-visible" 
+                   [class.!border-danger]="hasDuplicatePrices">
+                
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none z-0"></div>
+
+                <div class="flex justify-between items-start mb-4 relative z-40 gap-3">
+                  <div class="w-full relative">
+                    
+                    @if (openDropdownIndex() === priceIndex) {
+                      <div class="fixed inset-0 z-40 cursor-default" (click)="closeDropdown()"></div>
+                    }
+
+                    <button type="button" (click)="toggleDropdown(priceIndex)"
+                      class="relative z-50 w-full bg-[#0f172a] border border-[#1e293b] hover:border-[#3b82f6]/50 rounded-[1rem] px-5 py-3.5 text-sm font-bold text-[#e2e8f0] hover:text-white transition-all flex justify-between items-center shadow-lg cursor-pointer outline-none focus:outline-none"
+                      [class.ring-2]="openDropdownIndex() === priceIndex"
+                      [class.ring-primary]="openDropdownIndex() === priceIndex">
+                      
+                      <div class="flex items-center gap-3">
+                         <svg class="w-5 h-5 text-[#3b82f6]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                         <span class="truncate">{{ getSelectedDurationLabel(priceIndex) }}</span>
+                      </div>
+                      
+                      <span class="transition-transform duration-200 text-[#64748b]" [class.rotate-180]="openDropdownIndex() === priceIndex">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                      </span>
+                    </button>
+
+                    @if (openDropdownIndex() === priceIndex) {
+                      <div class="absolute top-full left-0 w-full mt-2 bg-[#0f172a] border border-[#1e293b] rounded-[1rem] shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200">
+                        
+                        <div class="py-2 relative z-10 max-h-60 overflow-y-auto rounded-[1rem]">
+                          @for (opt of durationOptions; track opt.days) {
+                            <button type="button" (click)="selectDuration(opt, priceIndex)"
+                              class="w-full text-left px-5 py-3 text-sm font-medium transition-colors flex items-center justify-between group hover:bg-[#1e293b] outline-none focus:outline-none"
+                              [class.text-[#3b82f6]]="priceCtrl.get('duration_in_days')?.value === opt.days"
+                              [class.bg-[#1e293b]]="priceCtrl.get('duration_in_days')?.value === opt.days"
+                              [class.text-[#94a3b8]]="priceCtrl.get('duration_in_days')?.value !== opt.days">
+                              
+                              <div class="flex items-center gap-3">
+                                <svg class="w-4 h-4 group-hover:text-[#3b82f6] transition-colors" [class.text-[#3b82f6]]="priceCtrl.get('duration_in_days')?.value === opt.days" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                                <span class="group-hover:text-[#f8fafc] transition-colors" [class.text-[#f8fafc]]="priceCtrl.get('duration_in_days')?.value === opt.days">{{ opt.label }}</span>
+                              </div>
+                              
+                              @if (priceCtrl.get('duration_in_days')?.value === opt.days) {
+                                <svg class="w-5 h-5 text-[#3b82f6]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                              }
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+
+                  <button type="button" (click)="removePriceOption(priceIndex)" [disabled]="pricesControls.length === 1"
+                    class="shrink-0 flex items-center justify-center w-[52px] h-[52px] text-danger/80 hover:text-danger bg-background hover:bg-danger/10 disabled:opacity-30 rounded-[1rem] transition-all cursor-pointer disabled:cursor-not-allowed shadow-sm border border-danger/20 relative z-40 outline-none focus:outline-none">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-3 relative z-10">
+                  
+                  <div class="w-full sm:w-1/2 bg-surface/50 rounded-2xl p-1 flex items-center border border-border/40 opacity-80 cursor-not-allowed">
+                    <span class="pl-4 pr-3 text-xs font-bold text-muted uppercase tracking-wider border-r border-border/50 shrink-0">
+                       Days
+                    </span>
+                    <input type="number" formControlName="duration_in_days" placeholder="30" readonly
+                      class="w-full bg-transparent border-0 outline-none focus:outline-none focus:ring-0 focus:border-transparent px-3 py-2.5 text-sm font-bold text-foreground font-mono cursor-not-allowed">
+                  </div>
+                  
+                  <div class="w-full sm:w-1/2 bg-surface rounded-2xl p-1 flex items-center border border-border/60 focus-within:border-success/50 transition-colors shadow-sm relative overflow-hidden group">
+                    <div class="absolute inset-y-0 left-0 w-10 bg-success/10 flex items-center justify-center transition-colors group-focus-within:bg-success/20">
+                      <span class="text-success font-bold text-sm">₹</span>
+                    </div>
+                    <input type="number" formControlName="price" placeholder="Amount"
+                      class="w-full bg-transparent border-0 outline-none focus:outline-none focus:ring-0 focus:border-transparent pl-12 pr-3 py-2.5 text-sm font-bold text-foreground font-mono">
+                  </div>
+
+                </div>
+              </div>
+            }
+            
+            <button type="button" (click)="addPriceOption()" class="h-full min-h-[160px] border-2 border-dashed border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/40 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all cursor-pointer relative z-10 outline-none focus:outline-none">
+              <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shadow-inner">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              </div>
+              <span class="text-sm font-bold tracking-wide">Add New Tier</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-12 pt-10 border-t border-border/50 flex flex-col items-center">
+          
+          <div class="flex items-center gap-2 mb-5">
+             <div class="w-2 h-2 rounded-full transition-colors duration-300" 
+                  [class.bg-success]="planForm.valid && !hasDuplicatePrices && !hasDuplicateFeatures" 
+                  [class.bg-danger]="planForm.invalid || hasDuplicatePrices || hasDuplicateFeatures"></div>
+             <span class="text-xs font-bold text-muted uppercase tracking-[0.15em]">
+                @if (planForm.valid && !hasDuplicatePrices && !hasDuplicateFeatures) {
+                  Ready to {{ isEditMode() ? 'Update' : 'Publish' }}
+                } @else {
+                  Complete all fields
+                }
+             </span>
+          </div>
+
+          <button type="submit" [disabled]="isLoading() || planForm.invalid || hasDuplicatePrices || hasDuplicateFeatures"
+            class="w-full md:w-auto min-w-[300px] bg-foreground text-background hover:bg-primary hover:text-primary-fg px-10 py-5 rounded-full font-extrabold text-lg shadow-2xl shadow-foreground/10 hover:shadow-primary/30 disabled:opacity-40 disabled:hover:bg-foreground disabled:hover:text-background disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 group cursor-pointer outline-none focus:outline-none">
+            @if (isLoading()) {
+              <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              Saving...
+            } @else {
+              {{ isEditMode() ? 'Update Membership' : 'Publish Membership' }}
+              <svg class="w-5 h-5 transform group-hover:translate-x-1.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            }
+          </button>
+        </div>
+
+      </form>
+    }
+  </div>
+</div>

@@ -1,0 +1,285 @@
+<div class="fixed top-4 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 z-50 flex items-center transition-transform duration-200 origin-right" [class.scale-110]="walletBump()">
+    <div class="relative overflow-hidden flex items-center gap-1.5 bg-surface/90 backdrop-blur-3xl border border-warning/30 shadow-[0_4px_20px_rgba(234,179,8,0.15)] pl-3 pr-1 py-1 rounded-full">
+        <div class="absolute inset-0 bg-warning/10"></div>
+        <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_4s_infinite]"></div>
+
+        <div class="relative w-5 h-5 flex items-center justify-center shrink-0">
+            <div class="absolute inset-0 bg-warning/50 rounded-full blur-[6px]"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full text-warning relative z-10 drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)]" fill="currentColor">
+                <ellipse cx="12" cy="17" rx="9" ry="4" fill="#854d0e" />
+                <ellipse cx="12" cy="14" rx="9" ry="4" fill="#a16207" />
+                <ellipse cx="12" cy="11" rx="9" ry="4" fill="#fde047" />
+                <ellipse cx="12" cy="11" rx="6" ry="2.5" fill="none" stroke="#ca8a04" stroke-width="1" />
+                <path d="M11 9.5l2 2h-2v1h-1v-3h1z" fill="#ca8a04" />
+            </svg>
+        </div>
+
+        <span class="premium-digits text-sm text-warning font-black tracking-widest min-w-[20px] text-center relative z-10 drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]">
+            {{ displayCoinBalance() }}
+        </span>
+
+        <div class="h-3 w-px bg-warning/30 mx-0.5 relative z-10"></div>
+
+        <button (click)="refreshCoins(true)" [disabled]="isCoinRefreshDisabled()" class="p-1 rounded-full hover:bg-warning/20 active:scale-90 transition-all duration-200 disabled:opacity-20 disabled:hover:bg-transparent disabled:cursor-not-allowed group cursor-pointer relative z-10">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5 text-warning/80 transition-transform duration-500" [class.animate-spin]="isCoinRefreshing()">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+        </button>
+    </div>
+</div>
+
+@if (showFlyingCoins()) {
+<div class="fixed inset-0 z-[99999] pointer-events-none">
+    @for (coin of coinArray; track coin) {
+    <div class="coin-x-curve delay-{{ coin }}">
+        <div class="coin-y-curve">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 animate-super-spin">
+                <div class="absolute inset-0 bg-warning/80 rounded-full blur-[10px]"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full text-warning relative z-10 drop-shadow-xl" fill="currentColor">
+                    <ellipse cx="12" cy="14" rx="10" ry="5" fill="#ca8a04" />
+                    <ellipse cx="12" cy="12" rx="10" ry="5" fill="#fde047" />
+                    <ellipse cx="12" cy="12" rx="7" ry="3" fill="none" stroke="#ca8a04" stroke-width="1.5" />
+                </svg>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+}
+
+<div class="w-full h-full flex justify-start items-start bg-background text-foreground font-sans p-3 sm:p-4 md:p-8 selection:bg-primary/20 lg:overflow-visible relative">
+    <div class="w-full h-full max-w-md lg:max-w-4xl flex flex-1 flex-col lg:flex-row gap-3 sm:gap-4 lg:gap-16 lg:bg-surface lg:p-12 lg:rounded-[3rem] lg:shadow-sm lg:border lg:border-border">
+
+        <div class="flex flex-col flex-1 justify-center">
+            <header class="bg-surface/50 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none border border-border lg:border-none rounded-2xl p-4 shadow-sm lg:shadow-none flex items-center justify-between transition-all mb-4 lg:mb-8">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold tracking-[0.2em] text-muted uppercase mb-1">Terminal Status</span>
+                    <h1 class="text-2xl md:text-3xl lg:text-4xl font-black text-foreground tracking-tight">
+                        {{ isCheckedIn() ? 'Active Session' : 'Ready to Train' }}
+                    </h1>
+                </div>
+
+                @if (isCheckedIn()) {
+                <div class="flex items-center gap-2 bg-success/10 border border-success/20 px-3 py-1.5 rounded-full shadow-sm shrink-0">
+                    <div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
+                    <span class="text-[10px] font-bold text-success uppercase tracking-widest hidden sm:inline-block">Live</span>
+                </div>
+                }
+            </header>
+
+            <div class="hidden lg:block mb-8">
+                <p class="text-muted text-lg font-medium leading-relaxed">
+                    @if (!isGymLocationValid()) {
+                        <span class="text-danger font-bold flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                            System Locked: Gym Location Not Configured
+                        </span> 
+                    }
+                    @else if (isLoading()) { {{ loadingMessage() || 'Processing attendance. Please wait...' }} }
+                    @else if (isCooldown()) {
+                    {{ isCheckedIn() ? 'Minimum workout time enforced.' : 'System locked to prevent duplicate entries.'
+                    }}<br>
+                    <span class="font-bold text-foreground">{{ isCheckedIn() ? 'Check out in' : 'Next session in' }} {{ formattedCooldown() }}</span>
+                    }
+                    @else if (isHolding()) { <span class="font-bold text-primary animate-pulse">Keep holding to confirm...</span> }
+                    @else { {{ isCheckedIn() ? 'Your session is tracked. Press and hold to check out.' : 'Press and hold to log your arrival.' }} }
+                </p>
+            </div>
+
+            <button [routerLink]="['/member/attendance/detail']" class="hidden lg:flex group w-full items-center justify-center gap-3 bg-background border border-border text-foreground py-4 rounded-2xl shadow-sm hover:border-primary/50 transition-all cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-muted group-hover:text-primary">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
+                <span class="font-bold text-[15px]">Attendance Records</span>
+            </button>
+        </div>
+
+        <div class="flex flex-col items-center justify-center flex-1 lg:py-4 relative">
+            <div class="w-full bg-surface lg:bg-transparent border border-border lg:border-none rounded-[2.5rem] lg:rounded-none p-6 md:p-12 lg:p-0 flex flex-col items-center justify-center relative shadow-sm lg:shadow-none overflow-hidden lg:overflow-visible">
+
+                <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b opacity-20 pointer-events-none lg:hidden" [ngClass]="isCheckedIn() ? 'from-danger to-transparent' : 'from-primary to-transparent'"></div>
+
+                <div class="relative flex items-center justify-center transition-all duration-500 ease-in-out w-64 h-64 lg:w-80 lg:h-80 rounded-full">
+
+                    @if (isLoading() || isCooldown()) {
+                    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center rounded-full bg-background/50 backdrop-blur-md text-foreground shadow-inner border border-border/50">
+                        @if (isLoading()) {
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-10 h-10 animate-spin mb-2 text-primary">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                        <span class="text-[10px] text-center px-4 font-black uppercase tracking-widest text-primary">{{ loadingMessage() || 'Marking...' }}</span>
+                        } @else {
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8 mb-1 text-muted">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                        <span class="text-xs font-black uppercase tracking-widest text-muted">Wait</span>
+                        <span class="text-2xl lg:text-3xl font-mono font-black mt-1">{{ formattedCooldown() }}</span>
+                        }
+                    </div>
+                    }
+
+                    @if (!isCheckedIn()) {
+                    <div class="absolute inset-0 z-0">
+                        <div class="reactor-ring-1"></div>
+                        <div class="reactor-ring-2"></div>
+                        <div class="reactor-ring-3"></div>
+                    </div>
+                    } @else {
+                    <div class="absolute inset-0 z-0 flex items-center justify-center">
+                        <div class="morph-blob"></div>
+                        <div class="morph-outline"></div>
+                    </div>
+                    }
+
+                    <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none scale-90 lg:scale-95" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" class="stroke-border" stroke-width="2" opacity="0.3"></circle>
+                        <circle cx="60" cy="60" r="54" fill="none" [ngClass]="isCheckedIn() ? 'stroke-danger' : 'stroke-primary'" class="progress-ring-circle" stroke-width="4" stroke-linecap="round" [style.stroke-dasharray]="339.292" [style.stroke-dashoffset]="339.292 - (339.292 * holdProgress()) / 100"></circle>
+                    </svg>
+
+                    <button (mousedown)="onHoldStart($event)" (mouseup)="onHoldEnd()" (mouseleave)="onHoldEnd()"
+                        (touchstart)="onHoldStart($event)" (touchend)="onHoldEnd()" (touchcancel)="onHoldEnd()"
+                        [disabled]="isLoading() || isCooldown() || !isGymLocationValid()" 
+                        style="-webkit-touch-callout: none;"
+                        class="touch-none select-none relative z-20 w-48 h-48 lg:w-56 lg:h-56 rounded-full flex flex-col items-center justify-center overflow-hidden transition-all duration-300 ease-out"
+                        [class.scale-95]="isHolding()"
+                        [class.cursor-not-allowed]="!isGymLocationValid()"
+                        [class.opacity-50]="!isGymLocationValid()"
+                        [class.cursor-pointer]="isGymLocationValid()"
+                        [ngClass]="isCheckedIn() ? 'bg-background border-4 border-danger text-danger shadow-[0_10px_40px_-10px_var(--color-danger)]' : 'bg-primary text-primary-fg shadow-[0_10px_40px_-10px_var(--color-primary)]'">
+                        <div class="flex flex-col items-center justify-center relative z-10 transition-opacity duration-300">
+                            @if (!isCheckedIn()) {
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-12 h-12 mb-2">
+                                <path d="m10 17 5-5-5-5" />
+                                <path d="M15 12H3" />
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                            </svg>
+                            <span class="text-xl font-black uppercase tracking-widest">Check In</span>
+                            } @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-12 h-12 mb-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9" />
+                            </svg>
+                            <span class="text-xl font-black uppercase tracking-widest">End Session</span>
+                            }
+                        </div>
+                    </button>
+                </div>
+
+                <div class="lg:hidden mt-8 text-center min-h-[3rem] px-2 w-full">
+                    <p class="text-muted text-sm font-medium leading-relaxed">
+                        @if (!isGymLocationValid()) {
+                            <span class="text-danger font-bold flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                System Locked: Gym Location Not Configured
+                            </span> 
+                        }
+                        @else if (isLoading()) { {{ loadingMessage() || 'Processing attendance. Please wait...' }} }
+                        @else if (isCooldown()) {
+                        {{ isCheckedIn() ? 'Minimum workout time enforced.' : 'System locked to prevent duplicate entries.' }}<br>
+                        <span class="font-bold text-foreground">{{ isCheckedIn() ? 'Check out in' : 'Next session in' }} {{ formattedCooldown() }}</span>
+                        }
+                        @else if (isHolding()) { <span class="font-bold text-primary animate-pulse">Keep holding to confirm...</span> }
+                        @else { {{ isCheckedIn() ? 'Your session is tracked. Press & hold to check out.' : 'Press & hold to log your arrival.' }} }
+                    </p>
+                </div>
+            </div>
+
+            <button (click)="toggleScanner()" [disabled]="isLoading() || isCooldown() || !isGymLocationValid()"
+                class="mt-6 w-full lg:w-3/4 flex items-center justify-center gap-3 bg-transparent border-2 border-dashed border-border hover:border-primary text-muted hover:text-primary py-4 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                [class.cursor-pointer]="isGymLocationValid()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75z" />
+                </svg>
+                <span class="font-bold text-lg">Scan QR Code Instead</span>
+            </button>
+        </div>
+
+        <button [routerLink]="['/member/attendance/detail']" class="lg:hidden shrink-0 group w-full flex items-center justify-center gap-3 bg-surface border border-border text-foreground py-4 rounded-2xl shadow-sm cursor-pointer mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-muted">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+            <span class="font-bold">Attendance Records</span>
+        </button>
+    </div>
+</div>
+
+@if (showCheckoutToast()) {
+<div class="fixed inset-x-0 bottom-25 sm:bottom-10 z-[9999] flex flex-col items-center gap-3 px-4 pointer-events-none">
+    <div class="toast-enter pointer-events-auto flex w-full max-w-md items-center gap-3 p-3 sm:p-4 rounded-2xl shadow-xl border border-success/20 bg-surface/95 backdrop-blur-sm text-foreground transition-all" role="alert">
+        <div class="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-background border border-border" [ngClass]=" 'text-success' ">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <p class="flex-1 text-sm font-medium tracking-tight">Attendance Marked successfully</p>
+    </div>
+</div>
+}
+
+@if (showLocationTroubleshoot()) {
+<div class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-fade-in">
+    <div class="bg-surface border border-border rounded-[2rem] shadow-2xl max-w-sm w-full p-6 flex flex-col gap-4">
+        <div class="flex items-center gap-3 text-danger">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+            </svg>
+            <h3 class="text-xl font-black text-foreground">Location Error</h3>
+        </div>
+        <p class="text-sm text-muted">We cannot verify you are at the gym. You may have blocked location access or selected <strong>"Approximate Location"</strong>.</p>
+        <div class="flex flex-col gap-2 mt-2">
+            <button (click)="closeLocationTroubleshoot()" class="w-full py-3 rounded-xl bg-primary text-primary-fg font-bold hover:opacity-90 transition-opacity">Got it</button>
+            <button (click)="toggleScanner()" class="w-full py-3 rounded-xl border border-border text-foreground font-bold hover:bg-surface-hover transition-colors">Use QR Code Scanner Instead</button>
+        </div>
+    </div>
+</div>
+}
+
+
+<div [class.hidden]="!isScannerOpen()" class="fixed inset-0 z-[9999] overflow-hidden bg-black touch-none flex flex-col items-center justify-center">
+    
+    <video #videoElement autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover z-0"></video>
+
+    <div class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+        <div class="relative w-64 h-64 sm:w-80 sm:h-80">
+            <div class="absolute -top-1 -left-1 w-10 h-10 border-t-4 border-l-4 border-white rounded-tl-[2.5rem]"></div>
+            <div class="absolute -top-1 -right-1 w-10 h-10 border-t-4 border-r-4 border-white rounded-tr-[2.5rem]"></div>
+            <div class="absolute -bottom-1 -left-1 w-10 h-10 border-b-4 border-l-4 border-white rounded-bl-[2.5rem]"></div>
+            <div class="absolute -bottom-1 -right-1 w-10 h-10 border-b-4 border-r-4 border-white rounded-br-[2.5rem]"></div>
+            @if (!isCameraLoading()) {
+                <div class="premium-laser absolute top-0 left-0 w-full h-1 bg-primary shadow-[0_0_15px_var(--color-primary)]"></div>
+            }
+        </div>
+    </div>
+
+    <div class="absolute inset-0 z-40 flex flex-col justify-between pointer-events-none">
+        <div class="w-full pt-16 px-6 text-center">
+            <div class="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full mb-4 shadow-lg">
+                <div class="w-2 h-2 rounded-full bg-success animate-pulse"></div>
+                <span class="text-white text-[10px] font-black tracking-[0.2em] uppercase">Live Scanner</span>
+            </div>
+            <h2 class="text-3xl font-black text-white tracking-tight drop-shadow-md">Scan Gym Pass</h2>
+        </div>
+
+        <div class="w-full pb-12 px-6 flex flex-col items-center pointer-events-auto">
+            <p class="text-white/80 text-sm font-medium mb-10 text-center bg-black/30 px-5 py-2.5 rounded-full backdrop-blur-md border border-white/5 shadow-xl">
+                Point camera at the front desk screen
+            </p>
+            <button (click)="closeScanner()" class="group flex items-center justify-center w-[72px] h-[72px] bg-white/15 hover:bg-white/25 active:bg-white/35 active:scale-95 backdrop-blur-3xl border border-white/30 rounded-full transition-all shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-white drop-shadow-md">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <span class="text-white/50 text-[10px] font-black uppercase tracking-[0.2em] mt-4">Cancel</span>
+        </div>
+    </div>
+
+    @if (isCameraLoading()) {
+    <div class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/90 backdrop-blur-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-12 h-12 animate-spin text-primary mb-6 shadow-primary">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+        </svg>
+        <span class="text-sm font-bold text-white tracking-widest uppercase animate-pulse">Accessing Camera</span>
+    </div>
+    }
+</div>

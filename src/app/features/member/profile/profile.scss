@@ -1,0 +1,151 @@
+$ticket-mask: radial-gradient(circle at 0 50%, transparent 20px, black 21px),
+  radial-gradient(circle at 100% 50%, transparent 20px, black 21px),
+  linear-gradient(black, black);
+
+.movie-ticket-container {
+  position: relative;
+  // filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+  overflow: hidden;
+  border-radius: 2.5rem;
+}
+
+.movie-ticket-content {
+  background: var(--surface);
+  mask-image: $ticket-mask;
+  -webkit-mask-image: $ticket-mask;
+  mask-composite: source-in;
+  -webkit-mask-composite: destination-in;
+  border-radius: 2.5rem;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+}
+
+.shine-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+
+  background: linear-gradient(to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0) 20%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0) 80%,
+      transparent 100%);
+
+  transform: skewX(-25deg) translateX(-150%);
+  animation: shine-logic 6s infinite ease-in-out;
+
+  mask-image: $ticket-mask;
+  -webkit-mask-image: $ticket-mask;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+@keyframes shine-logic {
+  0% {
+    transform: skewX(-25deg) translateX(-150%);
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  15% {
+    transform: skewX(-25deg) translateX(150%);
+    opacity: 1;
+  }
+
+  20% {
+    transform: skewX(-25deg) translateX(150%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: skewX(-25deg) translateX(150%);
+    opacity: 0;
+  }
+}
+
+.premium-spinner {
+  position: relative;
+  width: 50px;
+  height: 50px;
+
+  .loader-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: currentColor;
+    animation: loader-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+
+    &:nth-child(1) {
+      border-top-color: #ef4444;
+      animation-delay: -0.45s;
+    }
+
+    &:nth-child(2) {
+      border-top-color: var(--primary);
+      animation-delay: -0.3s;
+      inset: 4px;
+    }
+
+    &:nth-child(3) {
+      border-top-color: var(--foreground);
+      animation-delay: -0.15s;
+      inset: 8px;
+    }
+  }
+}
+
+@keyframes loader-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.text-6xl {
+  letter-spacing: -0.05em;
+  font-weight: 900;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom Scrollbar for Year Selection */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(var(--primary), 0.3);
+  border-radius: 4px;
+}

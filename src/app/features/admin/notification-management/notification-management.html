@@ -1,0 +1,196 @@
+<div class="h-full bg-background text-foreground pb-24 font-sans selection:bg-primary/20 relative">
+  <div class="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none z-0">
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 pt-8 md:pt-12">
+    <!-- Premium Header -->
+    <header class="mb-8 flex flex-col sm:flex-row justify-between items-center gap-6">
+      <div class="text-center sm:text-left">
+        <h1
+          class="text-3xl sm:text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+          Announcements
+        </h1>
+        <p class="text-muted mt-2 text-sm sm:text-base font-medium">Manage premium advertisements and updates.</p>
+      </div>
+
+      <button (click)="goToCreate()"
+        class="bg-primary/10 text-primary hover:bg-primary hover:text-primary-fg px-6 py-3.5 rounded-full text-sm font-bold transition-all flex items-center gap-2 shadow-sm cursor-pointer border border-primary/20 shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        New Announcement
+      </button>
+    </header>
+
+    <!-- Search & Filter (Premium Scaling) -->
+    <div class="flex flex-col md:flex-row gap-4 mb-6">
+      <!-- Search Input -->
+      <div
+        class="flex-grow bg-surface/80 backdrop-blur-xl border border-border/60 rounded-full p-1.5 shadow-sm flex items-center transition-all focus-within:border-primary/50 group">
+        <div class="pl-4 pr-2 text-primary">
+          <svg class="w-5 h-5 transition-transform group-focus-within:scale-110" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input type="text" placeholder="Search by title..." [ngModel]="searchInput()"
+          (ngModelChange)="searchInput.set($event)" (keyup.enter)="performSearch()"
+          class="w-full bg-transparent border-0 px-2 py-2.5 text-sm font-bold text-foreground placeholder:text-muted focus:ring-0 focus:outline-none">
+
+        @if (searchInput().length > 0) {
+        <button (click)="clearSearch()"
+          class="px-3 text-muted hover:text-danger transition-all cursor-pointer bg-transparent border-none">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        }
+        <button (click)="performSearch()"
+          class="shrink-0 bg-foreground text-background hover:bg-primary hover:text-primary-fg w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all cursor-pointer">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Filter Dropdown -->
+      <div class="filter-dropdown relative w-full md:w-56 flex flex-col group">
+        <div (click)="toggleFilterDropdown($event)" [class.border-primary]="isFilterDropdownOpen()"
+          class="w-full bg-surface/80 backdrop-blur-xl border border-border/60 text-foreground text-sm font-bold py-3.5 px-6 rounded-full flex justify-between items-center cursor-pointer hover:border-primary/50 transition-all shadow-sm">
+          <div class="flex items-center gap-2 truncate capitalize">
+            <span [class.text-muted]="!selectedType()" class="truncate">{{ selectedType() || 'All Types' }}</span>
+          </div>
+          <svg [class.rotate-180]="isFilterDropdownOpen()" class="h-4 w-4 text-muted transition-transform shrink-0"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+
+        @if (isFilterDropdownOpen()) {
+        <div
+          class="absolute top-[105%] right-0 w-full bg-surface/95 backdrop-blur-3xl border border-border/50 rounded-3xl shadow-2xl z-[100] py-3 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          @for (type of filterTypes; track type.name) {
+          <div (click)="selectFilter(type.name, $event)"
+            class="group/item flex items-center gap-3 px-6 py-3 mx-2 rounded-2xl hover:bg-background/80 transition-all cursor-pointer relative">
+            <span
+              class="font-black text-foreground/90 text-xs tracking-widest uppercase group-hover/item:text-primary transition-colors">{{
+              type.name }}</span>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+    <div
+      class="bg-surface/50 backdrop-blur-xl border border-border/60 rounded-[2rem] p-12 flex items-center justify-center">
+      <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
+    </div>
+    }
+    @else if (notifications().length === 0) {
+    <div class="bg-surface/30 border border-border/50 rounded-[2rem] p-16 text-center flex flex-col items-center">
+      <p class="text-muted text-sm font-bold">No Announcements Found</p>
+    </div>
+    }
+    @else {
+    <!-- PREMIUM MINIMALIST TABLE -->
+    <div class="w-full bg-surface/80 backdrop-blur border border-border/60 rounded-[1.5rem] shadow-sm overflow-hidden">
+      <table class="w-full text-left table-fixed border-collapse">
+        <thead class="bg-surface/50 border-b border-border/50 text-muted  font-black tracking-widest text-xs uppercase">
+          <tr >
+            <th class="px-1 py-2 text-center w-10 text-xs ">No.</th>
+            <th class="px-2 py-2 w-auto text-xs">Headline</th>
+            <th class="px-2 py-2 w-16 sm:w-24 text-center text-xs"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-border/40 text-xs sm:text-base">
+          @for (item of notifications(); track item.id; let i = $index) {
+          <tr class="hover:bg-background/60 transition-colors group">
+
+            <td class="px-1 py-2 text-center text-muted font-bold align-middle">{{ startIndex() + i }}</td>
+
+            <!-- TITLE (Proper readability, gracefully truncated if extreme) -->
+            <td class="px-1 py-2 font-bold text-foreground align-middle pr-2">
+              <div class="line-clamp-2 break-words leading-snug">{{ item.title }}</div>
+            </td>
+
+            <!-- ACTIONS -->
+            <td class="px-1 py-2 align-middle text-right relative action-menu">
+
+              <!-- 3 Dots Button -->
+              <button (click)="toggleMenu(item.id!, $event)"
+                class="p-2 text-muted hover:text-primary hover:bg-primary/10 rounded-full transition-colors focus:outline-none cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="5" r="1.5"></circle>
+                  <circle cx="12" cy="12" r="1.5"></circle>
+                  <circle cx="12" cy="19" r="1.5"></circle>
+                </svg>
+              </button>
+
+              <!-- Horizontal Slide-Out Menu -->
+              @if (openMenuId() === item.id) {
+              <div
+                class="absolute right-8 top-1/2 -translate-y-1/2 p-1.5 bg-surface/95 backdrop-blur-xl border border-border/60 rounded-full shadow-xl z-[100] flex gap-1.5 animate-in fade-in slide-in-from-right-4 duration-200">
+
+                <!-- Edit Button -->
+                <button (click)="editNotification(item.id!)"
+                  class="w-7 h-7 rounded-full border border-blue-500/30 bg-blue-500/10 flex items-center justify-center text-blue-500 hover:bg-blue-500 hover:text-white transition-all cursor-pointer shadow-sm"
+                  title="Edit">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+
+                <!-- Delete Button -->
+                <button (click)="deleteNotification(item.id!)"
+                  class="w-7 h-7 rounded-full border border-red-500/30 bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all cursor-pointer shadow-sm"
+                  title="Delete">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+
+              </div>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Premium Pagination -->
+    <div class="mt-8 flex flex-row justify-between items-center w-full gap-2">
+      <div class="bg-surface/80 border border-border/50 rounded-full px-3 py-1 flex items-center shadow-sm shrink-0">
+        <span class="text-xs font-extrabold text-primary">{{ startIndex() }}</span>
+        <span class="text-xs font-bold text-muted/50 mx-1">-</span>
+        <span class="text-xs font-extrabold text-primary">{{ endIndex() }}</span>
+        <span class="text-[10px] font-black text-muted mx-1 uppercase tracking-widest">/</span>
+        <span class="text-xs font-extrabold text-foreground">{{ totalItems() }}</span>
+      </div>
+
+      <div class="flex items-center gap-3 shrink-0">
+        <button (click)="goToPrevPage()" [disabled]="!hasPrevPage()"
+          class="w-7 h-7 rounded-full bg-surface/80 border border-border/60 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"><svg
+            class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg></button>
+        <button (click)="goToNextPage()" [disabled]="!hasNextPage()"
+          class="w-7 h-7 rounded-full bg-surface/80 border border-border/60 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"><svg
+            class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg></button>
+      </div>
+    </div>
+    }
+  </div>
+</div>

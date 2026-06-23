@@ -1,0 +1,213 @@
+<div class="h-full bg-background text-foreground font-sans p-2 sm:p-6 lg:p-10 relative ">
+  
+  <div class="max-w-7xl mx-auto relative z-10 space-y-4 sm:space-y-6">
+    
+    <!-- HEADER -->
+    <header class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl sm:text-4xl font-black tracking-tighter text-foreground uppercase">
+        Subscription<span class="text-primary">.</span>
+      </h1>
+      <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-surface border border-border">
+        <div class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+        <span class="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-muted">Admin</span>
+      </div>
+
+      <button type="button" [routerLink]="[`/${this.role}/subscription/pending-installment`]"
+        class="p-2 shrink-0 flex items-center justify-center rounded-full bg-danger/20 text-danger shadow-sm hover:bg-danger/40 transition-all active:scale-95 focus:outline-none"
+        title="Collect 2nd installment">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hand-coins-icon lucide-hand-coins w-6 h-6"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></svg>
+      </button>
+
+    </header>
+
+    <!-- SEARCH & FILTERS SECTION -->
+    <div class="flex flex-col gap-3">
+      
+      <!-- LINE 1: Search -->
+      <div class="w-full flex items-center bg-surface border border-border rounded-full p-1 shadow-sm">
+        <input 
+          type="text" [value]="searchInput()" (input)="onSearchInput($event)" (keydown.enter)="executeSearch()"
+          placeholder="Search Name" 
+          class="flex-1 bg-transparent border-none focus:outline-none text-xs sm:text-sm font-bold text-foreground placeholder:text-muted px-4 py-1.5"
+        >
+        @if (searchInput().length > 0) {
+          <button (click)="clearSearch()" class="p-1.5 text-muted hover:text-foreground transition-colors mr-1 rounded-full">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        }
+        <button (click)="executeSearch()" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-foreground text-background rounded-full hover:opacity-90 active:scale-95 transition-all shrink-0">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+        </button>
+      </div>
+
+      <!-- LINE 2: Dropdown, Date Picker & Toggle Wrapper (flex-wrap for mobile adaptation) -->
+      <div class="flex flex-wrap items-center gap-3 w-full">
+        
+        <!-- Status Dropdown -->
+        <div class="relative shrink-0">
+          <button (click)="toggleStatusDropdown()" class="h-9 sm:h-10 bg-surface border border-border rounded-full px-4 sm:px-5 flex items-center gap-2 hover:border-primary/50 transition-all shadow-sm">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+            <span class="text-xs sm:text-sm font-black text-foreground uppercase tracking-wide">{{ selectedStatus() }}</span>
+          </button>
+          
+          @if (isStatusDropdownOpen()) {
+            <div class="fixed inset-0 z-40 bg-background/20 sm:bg-transparent" (click)="closeModals()"></div>
+            <div class="absolute top-[110%] left-0 w-44 bg-surface border border-border rounded-2xl shadow-xl py-2 z-50">
+              @for (opt of statusOptions; track opt.value) {
+                <button (click)="selectStatus(opt.value)" class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-background transition-colors text-left">
+                  <svg class="w-4 h-4 {{ opt.color || 'text-muted' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" [attr.d]="opt.iconPath" /></svg>
+                  <span class="text-[11px] sm:text-xs font-black text-foreground uppercase tracking-widest">{{ opt.label }}</span>
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Date Picker -->
+        <div class="relative shrink-0">
+          <button (click)="toggleDatePicker()" class="h-9 sm:h-10 bg-surface border border-border rounded-full px-4 sm:px-5 flex items-center gap-2 hover:border-primary/50 transition-all shadow-sm">
+            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+            <span class="text-xs sm:text-sm font-black text-foreground uppercase tracking-wide">
+              {{ startDate() ? (startDate() | date:'MMM d') : 'DATE' }}{{ endDate() ? ' - ' + (endDate() | date:'MMM d') : '' }}
+            </span>
+            @if (startDate()) {
+              <div (click)="clearDateSelection($event)" class="ml-1 -mr-2 p-1 rounded-full hover:bg-border text-danger transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              </div>
+            }
+          </button>
+
+          @if (showDatePicker()) {
+            <div class="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none" (click)="closeModals()"></div>
+            <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:absolute sm:top-[110%] sm:right-0 sm:left-auto sm:translate-x-0 sm:translate-y-0 w-[280px] bg-surface border border-border rounded-3xl p-4 shadow-2xl z-50">
+              <div class="flex justify-between items-center bg-background rounded-full px-4 py-2 mb-3 border border-border">
+                <button (click)="prevMonth()" class="text-muted hover:text-foreground rounded-full p-1"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg></button>
+                <span class="text-xs font-black text-foreground uppercase tracking-[0.2em]">{{ months[calendarMonth()] }} {{ calendarYear() }}</span>
+                <button (click)="nextMonth()" class="text-muted hover:text-foreground rounded-full p-1"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg></button>
+              </div>
+              <div class="grid grid-cols-7 gap-1 mb-1.5">
+                @for (day of ['S','M','T','W','T','F','S']; track day) { <div class="text-[10px] text-muted font-bold text-center">{{day}}</div> }
+              </div>
+              <div class="grid grid-cols-7 gap-y-1.5 gap-x-1">
+                @for (date of calendarDays(); track $index) {
+                  @if (date) {
+                    <button 
+                      (click)="selectDate(date)" 
+                      [disabled]="isDateDisabled(date)"
+                      [class]="'h-8 rounded-full text-[11px] font-bold flex items-center justify-center transition-colors ' + 
+                              (isDateSelected(date) ? 'bg-primary text-primary-fg ' : 
+                               isInRange(date) ? 'bg-primary/20 text-foreground ' : 
+                               isDateDisabled(date) ? 'text-muted opacity-20 cursor-not-allowed ' : 
+                               'text-foreground hover:bg-border ')"
+                    >
+                      {{ date.getDate() }}
+                    </button>
+                  } @else { <div></div> }
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- NEW Premium Toggle for Expires in 7 Days -->
+        <button 
+  (click)="toggleExpiresIn7Days()"
+  [class]="'h-9 sm:h-10 border rounded-full px-4 sm:px-5 flex items-center gap-2 transition-all shadow-sm shrink-0 ' + 
+           (isExpiresIn7DaysActive() ? 'bg-primary border-primary text-primary-fg' : 'bg-surface border-border text-foreground hover:border-primary/50')"
+>
+  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+  <span class="text-xs sm:text-sm font-black uppercase tracking-wide">7d left</span>
+</button>
+
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-surface border border-border rounded-3xl overflow-hidden w-full shadow-sm">
+      <table class="w-full text-left table-fixed border-collapse">
+        
+        <thead class="border-b border-border bg-background/50">
+          <tr>
+            <th class="w-10 sm:w-12 py-3 sm:py-4 text-center text-[9px] sm:text-[10px] font-black text-muted uppercase tracking-widest align-middle">#</th>
+            <!-- User column takes remainder of space -->
+            <th class="py-3 sm:py-4 pl-1 sm:pl-4 text-[9px] sm:text-[10px] font-black text-muted uppercase tracking-widest align-middle">User</th>
+            <th class="w-20 sm:w-28 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black text-muted uppercase tracking-widest align-middle">Status</th>
+            <th class="w-16 sm:w-20 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black text-muted uppercase tracking-widest align-middle">Price</th>
+            <!-- Perfectly centered Action Header specifically widened for the larger button -->
+            <th class="w-16 sm:w-24 py-3 sm:py-4 text-center text-[9px] sm:text-[10px] font-black text-muted uppercase tracking-widest align-middle">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (isLoading()) {
+            @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
+              <tr class="border-b border-border/40">
+                <td class="w-10 sm:w-12 py-3.5 text-center align-middle"><div class="h-3 w-3 bg-border/50 rounded-full inline-block animate-pulse"></div></td>
+                <td class="py-3.5 pl-1 sm:pl-4 align-middle"><div class="h-3.5 w-24 sm:w-36 bg-border/50 rounded-full animate-pulse"></div></td>
+                <td class="w-20 sm:w-28 py-3.5 align-middle"><div class="h-3.5 w-14 bg-border/50 rounded-full animate-pulse"></div></td>
+                <td class="w-16 sm:w-20 py-3.5 align-middle"><div class="h-3.5 w-10 sm:w-12 bg-border/50 rounded-full animate-pulse"></div></td>
+                <td class="w-16 sm:w-24 py-3.5 text-center align-middle"><div class="h-8 w-8 sm:h-10 sm:w-10 bg-border/50 rounded-full inline-block animate-pulse align-middle"></div></td>
+              </tr>
+            }
+          } @else if (subscriptions().length === 0) {
+            <tr>
+              <td colspan="5" class="p-10 text-center text-[10px] font-black text-muted uppercase tracking-widest align-middle">No Data Found</td>
+            </tr>
+          } @else {
+            @for (sub of subscriptions(); track sub.id; let idx = $index) {
+              <tr class="border-b border-border/40 hover:bg-background/40 transition-colors">
+                
+                <td class="w-10 sm:w-12 py-3.5 text-center align-middle text-[10px] sm:text-xs font-black text-muted">{{ startIndex() + idx }}</td>
+                
+                <td class="py-3.5 pl-1 sm:pl-4 align-middle pr-2">
+                  <div class="text-[11px] sm:text-sm font-black text-foreground line-clamp-2 w-full break-words leading-tight" [title]="sub.profiles.full_name">
+                    {{ sub.profiles.full_name || 'N/A' }}
+                  </div>
+                </td>
+                
+              <td class="w-20 sm:w-28 py-3.5 align-middle">
+  @if (isExpiresIn7DaysActive()) {
+    <span class="text-[10px] sm:text-[11px] font-black uppercase tracking-widest leading-none text-warning">Expiring</span>
+  } @else {
+    <span [class]="getStatusClass(selectedStatus())">{{ selectedStatus() }}</span>
+  }
+</td>
+                
+                <td class="w-16 sm:w-20 py-3.5 align-middle">
+                  <div class="text-[11px] sm:text-sm font-black text-foreground">₹{{ sub.purchased_price }}</div>
+                </td>
+                
+                <td class="w-16 sm:w-24 py-3.5 text-center align-middle">
+                  <button [routerLink]="[`/${this.role}/subscription/detail`, sub.id]" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-border text-foreground inline-flex items-center justify-center hover:bg-primary hover:text-primary-fg transition-all shadow-sm align-middle">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5 -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="flex items-center justify-between w-full pt-1">
+      <div class="px-3 sm:px-4 py-2 rounded-full border border-border bg-surface shadow-sm flex items-center gap-1.5 text-[9px] sm:text-[11px] font-black">
+        <span class="text-primary">{{ startIndex() }}</span><span class="text-muted">-</span><span class="text-primary">{{ endIndex() }}</span>
+        <span class="text-muted mx-1">OF</span><span class="text-foreground">{{ totalCount() }}</span>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <button (click)="prevPage()" [disabled]="currentPage() === 1" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border border-border bg-surface shadow-sm text-foreground disabled:opacity-40 hover:not:disabled:border-primary transition-all">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <button (click)="nextPage()" [disabled]="currentPage() >= totalPages()" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border border-border bg-surface shadow-sm text-foreground disabled:opacity-40 hover:not:disabled:border-primary transition-all">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

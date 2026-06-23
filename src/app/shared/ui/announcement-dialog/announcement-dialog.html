@@ -1,0 +1,161 @@
+@if (isVisible() && localQueue().length > 0) {
+  <div class="fixed inset-0 z-[9999]  backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 select-none transition-opacity duration-700"
+       [class.opacity-0]="!isReadyToAnimate()"
+       [class.opacity-100]="isReadyToAnimate()">
+    
+    @if (localQueue().length > 1) {
+      <div class="absolute top-8 sm:top-12 text-muted text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+        Swipe to dismiss
+      </div>
+    }
+
+    <div class="relative w-full max-w-[340px] h-[72vh] min-h-[460px] max-h-[600px] perspective-[1500px] mt-4 flex items-center justify-center">
+      
+      @for (ad of localQueue(); track ad.id; let idx = $index) {
+        
+        <div class="absolute inset-0 w-full h-full bg-surface rounded-[2.5rem] flex flex-col origin-bottom touch-none will-change-transform border border-border transition-shadow duration-500 z-10"
+             [ngStyle]="getCardStyle(idx)"
+             [ngClass]="getVisualIndex(idx) === 0 ? getTheme(ad).topGlowClass : 'shadow-2xl'"
+             (touchstart)="onDragStart($event, idx)"
+             (touchmove)="onDragMove($event, idx)"
+             (touchend)="onDragEnd(idx)"
+             (mousedown)="onDragStart($event, idx)"
+             (mousemove)="onDragMove($event, idx)"
+             (mouseup)="onDragEnd(idx)"
+             (mouseleave)="onDragEnd(idx)">
+          
+          @if (getVisualIndex(idx) > 0) {
+            <div class="absolute inset-0 bg-background/50 z-[100] pointer-events-none rounded-[2.5rem] transition-opacity duration-300"></div>
+          }
+
+          <img src="/assets/gym_logo_transperant.png" class="absolute bottom-30 w-full h-full object-contain opacity-[0.2] z-0 pointer-events-none mix-blend-overlay p-4" alt="Gym Watermark" />
+
+          <div class="absolute -top-10 -left-10 w-48 h-48 rounded-full blur-[70px] opacity-30 pointer-events-none z-0 animate-orb"
+               [ngClass]="getTheme(ad).glowClass"></div>
+          <div class="absolute bottom-1/4 -right-10 w-40 h-40 rounded-full blur-[60px] opacity-20 pointer-events-none z-0 animate-orb"
+               style="animation-delay: -5s" [ngClass]="getTheme(ad).glowClass"></div>
+
+          @if (getVisualIndex(idx) === 0) {
+            <div class="absolute inset-0 w-[40%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none z-10 animate-shimmer"></div>
+          }
+
+          <div class="relative z-20 flex flex-col h-full w-full p-5 sm:p-6">
+            
+            <div class="shrink-0 flex justify-center mb-2">
+              <div class="px-4 py-1.5 rounded-full border bg-background/50 backdrop-blur-md flex items-center gap-2 shadow-sm" [ngClass]="getTheme(ad).boxClass">
+                <svg class="w-3.5 h-3.5" [ngClass]="getTheme(ad).titleClass" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" [attr.d]="getTheme(ad).badgeIcon"/>
+                </svg> 
+                <span class="text-[10px] font-bold uppercase tracking-[0.1em]" [ngClass]="getTheme(ad).titleClass">
+                  {{ getTheme(ad).badgeText }}
+                </span>
+              </div>
+            </div>
+
+            <div class="flex-1 flex flex-col justify-center items-center w-full min-h-0">
+              
+              <div class="shrink-0 flex items-center justify-center relative mb-5 pointer-events-none h-24">
+                
+                @if (getTheme(ad).svgIcon === 'coupon') {
+                  <div class="relative animate-float-premium">
+                    <svg class="w-24 h-24 text-warning" viewBox="0 0 100 100" fill="currentColor">
+                      <path d="M50 5 L85 25 L85 60 C85 80 65 92 50 95 C35 92 15 80 15 60 L15 25 Z" opacity="0.2"/>
+                      <path d="M50 5 L85 25 L85 60 C85 80 65 92 50 95 C35 92 15 80 15 60 L15 25 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                      <circle cx="38" cy="38" r="7" />
+                      <circle cx="62" cy="62" r="7" />
+                      <line x1="65" y1="35" x2="35" y2="65" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                }
+
+                @if (getTheme(ad).svgIcon === 'offer') {
+                  <div class="relative animate-float-premium">
+                    <svg class="w-24 h-24 text-accent" viewBox="0 0 100 100" fill="currentColor">
+                      <polygon points="30,20 70,20 85,45 15,45" opacity="0.6"/>
+                      <polygon points="30,20 50,45 15,45" opacity="0.3"/>
+                      <polygon points="70,20 85,45 50,45" opacity="0.8"/>
+                      <polygon points="15,45 85,45 50,90" opacity="0.4"/>
+                      <polygon points="15,45 50,45 50,90" opacity="0.2"/>
+                      <polygon points="85,45 50,45 50,90" opacity="0.7"/>
+                      <circle cx="28" cy="28" r="4" fill="var(--surface)"/>
+                    </svg>
+                  </div>
+                }
+
+                @if (getTheme(ad).svgIcon === 'urgent') {
+                  <div class="relative animate-float-premium">
+                    <div class="absolute inset-0 rounded-full border border-danger/40 animate-ping opacity-50"></div>
+                    <svg class="w-24 h-24 text-danger relative z-10" viewBox="0 0 100 100" fill="currentColor">
+                      <polygon points="50,10 90,25 80,75 50,95 20,75 10,25" opacity="0.2" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                      <polygon points="50,18 80,30 72,68 50,85 28,68 20,30" opacity="0.5"/>
+                      <polygon points="50,18 20,30 28,68 50,85" opacity="0.8"/>
+                      <rect x="46" y="35" width="8" height="25" rx="4" fill="var(--surface)"/>
+                      <circle cx="50" cy="70" r="5" fill="var(--surface)"/>
+                    </svg>
+                  </div>
+                }
+
+                @if (getTheme(ad).svgIcon === 'standard') {
+                  <div class="relative animate-float-premium">
+                    <svg class="w-24 h-24 text-primary" viewBox="0 0 100 100" fill="currentColor">
+                      <path d="M50 15 C 25 15 20 45 20 65 L 15 75 L 85 75 L 80 65 C 80 45 75 15 50 15 Z" opacity="0.2"/>
+                      <path d="M50 25 C 35 25 30 45 30 65 L 25 70 L 75 70 L 70 65 C 70 45 65 25 50 25 Z" opacity="0.6"/>
+                      <path d="M50 25 C 35 25 30 45 30 65 L 50 65 Z" opacity="0.8"/> 
+                      <circle cx="50" cy="15" r="6" fill="none" stroke="currentColor" stroke-width="3"/>
+                      <path d="M42 75 A 8 8 0 0 0 58 75 Z" opacity="0.9"/>
+                      <path d="M10 50 A 40 40 0 0 0 20 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                      <path d="M90 50 A 40 40 0 0 1 80 80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                    </svg>
+                  </div>
+                }
+              </div>
+
+              <h2 class="shrink-0 text-2xl font-black tracking-tight leading-tight text-center mb-4 text-foreground z-20">
+                {{ ad.title }}
+              </h2>
+
+              <div class="w-full relative z-10">
+                <div class="rounded-[1.2rem] border bg-background/60 backdrop-blur-sm shadow-sm flex flex-col pt-5 pb-3 px-3" [ngClass]="getTheme(ad).boxClass">
+                  
+                  <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 p-1.5 rounded-full border bg-surface z-20 shadow-sm" [ngClass]="getTheme(ad).boxIconClass">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getTheme(ad).badgeIcon"/>
+                    </svg>
+                  </div>
+
+                  <div class="overflow-y-auto hidden-scrollbar max-h-[140px] w-full flex items-center justify-center text-center px-2">
+                    <p class="text-[13px] font-medium leading-relaxed text-muted w-full m-0">
+                      {{ ad.content }}
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <div class="shrink-0 mt-4 w-full pointer-events-auto">
+              <button type="button" (click)="acknowledgeCard(idx); $event.stopPropagation()" 
+                class="w-full py-3.5 rounded-full text-[14px] font-black tracking-widest transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-95 group bg-transparent shadow-lg"
+                [ngClass]="getTheme(ad).btnClass">
+                Got it!
+                <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (localQueue().length > 1) {
+      <div class="mt-4 flex gap-2 z-10">
+        @for (item of localQueue(); track $index) {
+          <div class="h-1.5 rounded-full transition-all duration-500"
+               [ngClass]="currentIndex() === $index ? 'w-6 bg-primary' : 'w-1.5 bg-primary/20'">
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+}

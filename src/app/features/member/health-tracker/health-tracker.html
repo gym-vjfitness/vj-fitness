@@ -1,0 +1,339 @@
+@if (!isLoading()) {
+<!-- Background Watermark SVG for Main Page -->
+<div class="fixed inset-0 pointer-events-none z-0 flex items-center justify-center opacity-[0.09] text-foreground overflow-hidden">
+  <svg class="w-[120%] h-[120%] -rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="0.5">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+  </svg>
+</div>
+
+<div class="relative z-10 h-full bg-transparent p-4 md:p-6 animate-fade-in font-sans overflow-x-hidden">
+  
+  <div class="max-w-4xl mx-auto space-y-6 pb-2">
+    
+    <!-- Hero Header Area -->
+    <!-- Hero Header Area -->
+    <header class="flex flex-col gap-6">
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-foreground leading-none">Health Vitals</h1>
+          <p class="text-muted font-bold mt-2 text-sm sm:text-base tracking-wide">Your physical progress over time.</p>
+        </div>
+        
+       <!-- ✅ Premium Anti-Spam Sync Button -->
+        <button (click)="handleManualRefresh()" [disabled]="isRefreshing()" class="p-2 rounded-full bg-surface border border-border/50 shadow-sm text-foreground hover:bg-border/30 active:scale-95 transition-all">
+          <svg [class.animate-spin]="isRefreshing()" class="w-4 h-4 md:w-6 md:h-6 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- BUTTON GROUP: Record & Insights side-by-side -->
+      <div class="flex flex-col sm:flex-row gap-3 w-full">
+        <button 
+          (click)="openUpdateModal()"
+          [disabled]="!canUpdate()"
+          class="flex-1 flex items-center justify-center rounded-[1.5rem] bg-foreground px-6 py-4 text-sm sm:text-base font-black text-background shadow-xl shadow-foreground/10 transition-all active:scale-95 disabled:opacity-20 disabled:shadow-none disabled:active:scale-100">
+          @if (canUpdate()) {
+            + Record New Vitals
+          } @else {
+            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            Locked for {{ daysUntilNextUpdate() }} Days
+          }
+        </button>
+
+        <button 
+          (click)="navigateToInsights()"
+          class="flex-1 flex items-center justify-center rounded-[1.5rem] bg-surface border border-border/60 px-6 py-4 text-sm sm:text-base font-black text-foreground shadow-sm transition-all active:scale-95 hover:bg-border/20">
+          <svg class="w-5 h-5 mr-2 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Deep Insights
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Vitals Showcase -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      
+      <!-- Weight Card -->
+      <div class="rounded-[2rem] bg-surface/80 backdrop-blur-xl border border-primary/40 p-6 flex flex-col justify-between shadow-sm relative overflow-hidden">
+        <svg class="absolute -right-6 -bottom-6 w-32 h-32 opacity-[0.03] text-foreground pointer-events-none -rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M7 6v12M17 6v12M3 18h18M9 10h6" />
+        </svg>
+        <div class="flex items-center gap-2 mb-6 relative z-10">
+          <div class="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_10px_rgba(59,130,246,0.6)]"></div>
+          <p class="text-[11px] font-black text-foreground uppercase tracking-[0.2em]">Weight</p>
+        </div>
+        <div class="flex items-baseline gap-1.5 relative z-10">
+          <span class="text-5xl sm:text-6xl font-black text-foreground tracking-tighter">{{ memberData()?.weight_kg || '--' }}</span>
+          <span class="text-lg font-bold text-muted">kg</span>
+        </div>
+      </div>
+      
+      <!-- Height Card -->
+      <div class="rounded-[2rem] bg-surface/80 backdrop-blur-xl border border-accent/40 p-6 flex flex-col justify-between shadow-sm relative overflow-hidden">
+        <svg class="absolute -right-4 -bottom-8 w-32 h-32 opacity-[0.03] text-foreground pointer-events-none rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 3v18M6 8h4m-4 4h4m-4 4h4M16 3v18M16 8h4m-4 4h4m-4 4h4" />
+        </svg>
+        <div class="flex items-center gap-2 mb-6 relative z-10">
+          <div class="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_10px_rgba(139,92,246,0.6)]"></div>
+          <p class="text-[11px] font-black text-foreground uppercase tracking-[0.2em]">Height</p>
+        </div>
+        <div class="flex items-baseline gap-1.5 relative z-10">
+          <span class="text-5xl sm:text-6xl font-black text-foreground tracking-tighter">{{ memberData()?.height_cm || '--' }}</span>
+          <span class="text-lg font-bold text-muted">cm</span>
+        </div>
+      </div>
+
+      <!-- Chest Card -->
+      <div class="rounded-[2rem] bg-surface/80 backdrop-blur-xl border border-warning/40 p-6 flex flex-col justify-between shadow-sm relative overflow-hidden">
+        <svg class="absolute -right-4 -bottom-8 w-32 h-32 opacity-[0.03] text-foreground pointer-events-none rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0" />
+        </svg>
+        <div class="flex items-center gap-2 mb-6 relative z-10">
+          <div class="w-2.5 h-2.5 rounded-full bg-warning shadow-[0_0_10px_rgba(245,158,11,0.6)]"></div>
+          <p class="text-[11px] font-black text-foreground uppercase tracking-[0.2em]">Chest</p>
+        </div>
+        <div class="flex items-baseline gap-1.5 relative z-10">
+          <span class="text-5xl sm:text-6xl font-black text-foreground tracking-tighter">{{ memberData()?.chest_cm || '--' }}</span>
+          <span class="text-lg font-bold text-muted">cm</span>
+        </div>
+      </div>
+
+      <!-- Waist Card -->
+      <div class="rounded-[2rem] bg-surface/80 backdrop-blur-xl border border-success/40 p-6 flex flex-col justify-between shadow-sm relative overflow-hidden">
+        <svg class="absolute -right-4 -bottom-8 w-32 h-32 opacity-[0.03] text-foreground pointer-events-none rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        <div class="flex items-center gap-2 mb-6 relative z-10">
+          <div class="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_10px_rgba(16,185,129,0.6)]"></div>
+          <p class="text-[11px] font-black text-foreground uppercase tracking-[0.2em]">Waist</p>
+        </div>
+        <div class="flex items-baseline gap-1.5 relative z-10">
+          <span class="text-5xl sm:text-6xl font-black text-foreground tracking-tighter">{{ memberData()?.waist_cm || '--' }}</span>
+          <span class="text-lg font-bold text-muted">cm</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Graph -->
+    <div class="rounded-[2rem] bg-surface/80 backdrop-blur-xl border border-border/40 p-5 sm:p-8 shadow-sm relative overflow-hidden">
+       <svg class="absolute inset-0 w-full h-full opacity-[0.02] text-foreground pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="0.5">
+         <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+       </svg>
+       
+      <div class="flex items-center justify-between mb-2 px-2 relative z-10">
+        <h3 class="text-xl font-black text-foreground tracking-tight">Trends</h3>
+        <p class="flex items-center gap-1.5 text-[10px] font-bold text-muted uppercase tracking-widest bg-background border border-border/50 px-3 py-1.5 rounded-full shadow-sm">
+          <svg class="w-3.5 h-3.5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h8M8 7l4-4m-4 4l4 4m0 6H4m8 0l-4-4m4 4l-4 4"/></svg>
+          Swipe
+        </p>
+      </div>
+      
+      <div class="relative z-10">
+        @if (isChartReady() && historyData().length > 0) {
+          <div echarts [options]="chartOptions()" [autoResize]="true" class="w-full h-[300px] block"></div>
+        } @else if (isChartReady()) {
+          <div class="w-full h-[300px] flex items-center justify-center rounded-3xl bg-background/50 border border-dashed border-border">
+            <p class="text-muted font-bold">No trend data available yet.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Health Bio Information -->
+    <div>
+      <h3 class="text-lg font-black text-foreground tracking-tight mb-4 px-2">Medical Profile</h3>
+      <div class="rounded-[2rem] bg-surface/80 backdrop-blur-xl border border-border/40 overflow-hidden shadow-sm">
+        
+        <div class="grid grid-cols-2 divide-x divide-border/40 border-b border-border/40">
+          <div class="p-5 sm:p-6 relative overflow-hidden">
+             <svg class="absolute -right-4 -bottom-4 w-20 h-20 opacity-[0.03] text-foreground pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M12 21.5c-3.3 0-6-2.7-6-6 0-3 6-10.5 6-10.5s6 7.5 6 10.5c0 3.3-2.7 6-6 6z M9.5 14h5 M12 11.5v5" />
+             </svg>
+            <span class="block text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-1 relative z-10">Blood Group</span>
+            <span class="text-lg font-black text-foreground relative z-10">{{ memberData()?.blood_group || 'N/A' }}</span>
+          </div>
+          
+          <div class="p-5 sm:p-6 relative overflow-hidden">
+             <svg class="absolute -right-4 -bottom-4 w-20 h-20 opacity-[0.03] text-foreground pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+               <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+             </svg>
+            <span class="block text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-1 relative z-10">Fitness Goal</span>
+            <span class="text-lg font-black text-foreground capitalize relative z-10">{{ memberData()?.fitness_goal || 'N/A' }}</span>
+          </div>
+        </div>
+
+        <div class="p-5 sm:p-6 border-b border-border/40">
+          <span class="flex items-center gap-2 text-[10px] font-black text-warning uppercase tracking-[0.2em] mb-2">
+            <span class="w-2 h-2 rounded-full bg-warning"></span> Medical Conditions
+          </span>
+          <span class="block text-sm font-bold text-muted leading-relaxed">{{ memberData()?.medical_conditions || 'None reported on your profile.' }}</span>
+        </div>
+
+        <div class="p-5 sm:p-6">
+          <span class="flex items-center gap-2 text-[10px] font-black text-danger uppercase tracking-[0.2em] mb-2">
+             <span class="w-2 h-2 rounded-full bg-danger"></span> Injuries History
+          </span>
+          <span class="block text-sm font-bold text-muted leading-relaxed">{{ memberData()?.injuries_history || 'None reported on your profile.' }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- iOS Segmented Modal (z-[9999] safely covers ANY custom bottom navbars) -->
+@if (isUpdateModalOpen()) {
+  <div class="fixed inset-0 z-[9999] flex items-end justify-center sm:items-center">
+    
+    <div class="absolute inset-0 bg-background/80 backdrop-blur-xl animate-fade-in" (click)="closeUpdateModal()"></div>
+    
+    <div class="relative w-full sm:max-w-md bg-surface rounded-t-[2.5rem] sm:rounded-[2.5rem] border border-border/40 shadow-[0_-20px_50px_rgba(0,0,0,0.15)] p-6 md:p-8 pb-[calc(2rem+env(safe-area-inset-bottom))] sm:pb-8 animate-slide-up overflow-hidden">
+      
+      <svg class="absolute -right-10 -top-10 w-64 h-64 opacity-[0.02] text-foreground pointer-events-none rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="0.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+
+      <div class="w-12 h-1.5 bg-border rounded-full mx-auto mb-8 sm:hidden relative z-10"></div>
+
+      <div class="flex justify-between items-center mb-8 relative z-10">
+        <h2 class="text-3xl font-black text-foreground tracking-tight">Record Data</h2>
+        <button (click)="closeUpdateModal()" class="w-10 h-10 flex items-center justify-center rounded-full bg-background border border-border/50 text-muted hover:text-foreground transition-colors">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 bg-background rounded-2xl p-1.5 mb-8 border border-border/40 relative z-10">
+        <button type="button" (click)="setUpdateTab('weight')" [class.bg-surface]="activeUpdateTab() === 'weight'" [class.shadow-sm]="activeUpdateTab() === 'weight'" [class.text-foreground]="activeUpdateTab() === 'weight'" [class.text-muted]="activeUpdateTab() !== 'weight'" class="flex-1 py-3 rounded-xl text-sm font-black transition-all">Weight</button>
+        <button type="button" (click)="setUpdateTab('height')" [class.bg-surface]="activeUpdateTab() === 'height'" [class.shadow-sm]="activeUpdateTab() === 'height'" [class.text-foreground]="activeUpdateTab() === 'height'" [class.text-muted]="activeUpdateTab() !== 'height'" class="flex-1 py-3 rounded-xl text-sm font-black transition-all">Height</button>
+        <button type="button" (click)="setUpdateTab('chest')" [class.bg-surface]="activeUpdateTab() === 'chest'" [class.shadow-sm]="activeUpdateTab() === 'chest'" [class.text-foreground]="activeUpdateTab() === 'chest'" [class.text-muted]="activeUpdateTab() !== 'chest'" class="flex-1 py-3 rounded-xl text-sm font-black transition-all">Chest</button>
+        <button type="button" (click)="setUpdateTab('waist')" [class.bg-surface]="activeUpdateTab() === 'waist'" [class.shadow-sm]="activeUpdateTab() === 'waist'" [class.text-foreground]="activeUpdateTab() === 'waist'" [class.text-muted]="activeUpdateTab() !== 'waist'" class="flex-1 py-3 rounded-xl text-sm font-black transition-all">Waist</button>
+      </div>
+
+      <form [formGroup]="updateForm" (ngSubmit)="submitUpdate()" class="space-y-4 relative z-10">
+        
+        <!-- WEIGHT TAB -->
+        <div [class.hidden]="activeUpdateTab() !== 'weight'" class="animate-fade-in">
+          <div [class.border-danger]="isFieldInvalid('weight_kg')"
+               [class.focus-within:border-danger]="isFieldInvalid('weight_kg')"
+               [class.border-border]="!isFieldInvalid('weight_kg')"
+               [class.focus-within:border-primary]="!isFieldInvalid('weight_kg')"
+               class="bg-background rounded-[2rem] border p-2 flex items-center transition-colors shadow-inner">
+            <div class="flex-1 px-5 py-3">
+              <label class="block text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-1" [class.text-danger]="isFieldInvalid('weight_kg')">New Weight</label>
+              <input type="number" formControlName="weight_kg" step="0.1" (blur)="updateForm.get('weight_kg')?.markAsTouched()" class="w-full bg-transparent text-4xl font-black text-foreground focus:outline-none placeholder:text-muted/20" placeholder="0.0">
+            </div>
+            <div class="px-6 text-lg font-black text-muted border-l border-border/40">kg</div>
+          </div>
+          @if (isFieldInvalid('weight_kg')) {
+            <p class="text-danger text-xs font-bold mt-3 ml-4 animate-fade-in flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {{ getErrorMessage('weight_kg') }}
+            </p>
+          }
+        </div>
+        
+        <!-- HEIGHT TAB -->
+        <div [class.hidden]="activeUpdateTab() !== 'height'" class="animate-fade-in">
+          <div [class.border-danger]="isFieldInvalid('height_cm')"
+               [class.focus-within:border-danger]="isFieldInvalid('height_cm')"
+               [class.border-border]="!isFieldInvalid('height_cm')"
+               [class.focus-within:border-accent]="!isFieldInvalid('height_cm')"
+               class="bg-background rounded-[2rem] border p-2 flex items-center transition-colors shadow-inner">
+            <div class="flex-1 px-5 py-3">
+              <label class="block text-[10px] font-black text-accent uppercase tracking-[0.2em] mb-1" [class.text-danger]="isFieldInvalid('height_cm')">New Height</label>
+              <input type="number" formControlName="height_cm" step="0.1" (blur)="updateForm.get('height_cm')?.markAsTouched()" class="w-full bg-transparent text-4xl font-black text-foreground focus:outline-none placeholder:text-muted/20" placeholder="0.0">
+            </div>
+            <div class="px-6 text-lg font-black text-muted border-l border-border/40">cm</div>
+          </div>
+          @if (isFieldInvalid('height_cm')) {
+            <p class="text-danger text-xs font-bold mt-3 ml-4 animate-fade-in flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {{ getErrorMessage('height_cm') }}
+            </p>
+          }
+        </div>
+
+        <!-- CHEST TAB -->
+        <div [class.hidden]="activeUpdateTab() !== 'chest'" class="animate-fade-in">
+          <div [class.border-danger]="isFieldInvalid('chest_cm')"
+               [class.focus-within:border-danger]="isFieldInvalid('chest_cm')"
+               [class.border-border]="!isFieldInvalid('chest_cm')"
+               [class.focus-within:border-warning]="!isFieldInvalid('chest_cm')"
+               class="bg-background rounded-[2rem] border p-2 flex items-center transition-colors shadow-inner">
+            <div class="flex-1 px-5 py-3">
+              <label class="block text-[10px] font-black text-warning uppercase tracking-[0.2em] mb-1" [class.text-danger]="isFieldInvalid('chest_cm')">New Chest</label>
+              <input type="number" formControlName="chest_cm" step="0.1" (blur)="updateForm.get('chest_cm')?.markAsTouched()" class="w-full bg-transparent text-4xl font-black text-foreground focus:outline-none placeholder:text-muted/20" placeholder="0.0">
+            </div>
+            <div class="px-6 text-lg font-black text-muted border-l border-border/40">cm</div>
+          </div>
+          @if (isFieldInvalid('chest_cm')) {
+            <p class="text-danger text-xs font-bold mt-3 ml-4 animate-fade-in flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {{ getErrorMessage('chest_cm') }}
+            </p>
+          }
+        </div>
+
+        <!-- WAIST TAB -->
+        <div [class.hidden]="activeUpdateTab() !== 'waist'" class="animate-fade-in">
+          <div [class.border-danger]="isFieldInvalid('waist_cm')"
+               [class.focus-within:border-danger]="isFieldInvalid('waist_cm')"
+               [class.border-border]="!isFieldInvalid('waist_cm')"
+               [class.focus-within:border-success]="!isFieldInvalid('waist_cm')"
+               class="bg-background rounded-[2rem] border p-2 flex items-center transition-colors shadow-inner">
+            <div class="flex-1 px-5 py-3">
+              <label class="block text-[10px] font-black text-success uppercase tracking-[0.2em] mb-1" [class.text-danger]="isFieldInvalid('waist_cm')">New Waist</label>
+              <input type="number" formControlName="waist_cm" step="0.1" (blur)="updateForm.get('waist_cm')?.markAsTouched()" class="w-full bg-transparent text-4xl font-black text-foreground focus:outline-none placeholder:text-muted/20" placeholder="0.0">
+            </div>
+            <div class="px-6 text-lg font-black text-muted border-l border-border/40">cm</div>
+          </div>
+          @if (isFieldInvalid('waist_cm')) {
+            <p class="text-danger text-xs font-bold mt-3 ml-4 animate-fade-in flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {{ getErrorMessage('waist_cm') }}
+            </p>
+          }
+        </div>
+
+        <button type="submit" 
+                [disabled]="isCurrentTabInvalid() || isSubmitting()" 
+                class="w-full mt-8 py-5 rounded-[1.5rem] bg-foreground text-background font-black text-lg active:scale-[0.98] disabled:opacity-30 disabled:active:scale-100 transition-all flex justify-center items-center shadow-xl shadow-foreground/10">
+          @if (isSubmitting()) {
+            <div class="w-6 h-6 border-[3px] border-background border-t-transparent rounded-full animate-spin"></div>
+          } @else {
+            <svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+             Update Health Details
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+}
+} @else {
+
+<!-- ✅ Premium Pulse Skeleton Loader (Perfect layout match) -->
+<div class="h-full bg-transparent p-4 md:p-6 font-sans overflow-x-hidden">
+  <div class="max-w-4xl mx-auto space-y-6 pb-24">
+    <header class="flex flex-col gap-6 animate-pulse mt-4">
+      <div class="flex justify-between items-start">
+        <div>
+          <div class="h-12 w-52 bg-surface border border-border/50 rounded-xl mb-4"></div>
+          <div class="h-4 w-64 bg-surface border border-border/50 rounded-full"></div>
+        </div>
+        <div class="h-12 w-12 rounded-full bg-surface border border-border/50"></div>
+      </div>
+      <div class="h-14 w-full sm:w-56 bg-surface border border-border/50 rounded-[1.5rem]"></div>
+    </header>
+    
+    <div class="grid grid-cols-2 gap-4 animate-pulse">
+      <div class="h-44 rounded-[2rem] bg-surface/80 border border-border/40"></div>
+      <div class="h-44 rounded-[2rem] bg-surface/80 border border-border/40"></div>
+    </div>
+    
+    <div class="h-[380px] rounded-[2rem] bg-surface/80 border border-border/40 animate-pulse"></div>
+    <div class="h-56 rounded-[2rem] bg-surface/80 border border-border/40 animate-pulse"></div>
+  </div>
+</div>
+}

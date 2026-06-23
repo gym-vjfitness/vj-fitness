@@ -1,0 +1,6 @@
+# Explicit app routes ONLY. Do not use a wildcard /* catch-all.
+/auth/* /index.html 200
+/admin/* /index.html 200
+/member/* /index.html 200
+/trainer/* /index.html 200
+/ /index.html 200

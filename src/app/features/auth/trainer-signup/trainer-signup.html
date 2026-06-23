@@ -1,0 +1,325 @@
+<div class="relative min-h-[100dvh] flex flex-col bg-background text-foreground selection:bg-primary/30">
+
+  <div class="fixed top-0 left-0 w-full h-[45dvh] md:h-[100dvh] md:w-5/12 lg:w-1/2 z-0 pointer-events-none
+              [-webkit-mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] 
+              [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] 
+              md:[-webkit-mask-image:none] md:[mask-image:none]">
+    
+    <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop"
+      class="absolute inset-0 w-full h-full object-cover grayscale brightness-[0.6]" alt="Gym Background">
+    
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background/50 md:bg-gradient-to-r md:from-transparent md:via-background/50 md:to-background">
+    </div>
+    
+    <div class="absolute bottom-[55%] md:bottom-auto left-6 md:top-12 md:left-12 z-10">
+      <div class="h-10 md:h-12 w-1.5 bg-primary mb-2 md:mb-3 shadow-[0_0_20px_var(--primary)] animate-pulse"></div>
+      <h1 class="text-4xl md:text-6xl font-black italic tracking-tighter text-white uppercase drop-shadow-2xl">
+        VJ<span class="text-primary">FITNESS</span>
+      </h1>
+      <div class="flex items-center gap-2 mt-1 md:mt-2 opacity-80">
+        <span class="h-px w-6 md:w-8 bg-white/50"></span>
+        <span class="text-white/90 text-[10px] font-bold tracking-[0.3em] uppercase">New Trainer</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="relative z-10 flex flex-col md:flex-row w-full flex-1">
+
+    <div class="w-full h-[25dvh] md:hidden shrink-0 pointer-events-none"></div>
+
+    <div class="w-full shrink-0 md:w-7/12 lg:w-1/2 md:ml-auto flex flex-col items-center justify-start bg-transparent backdrop-blur-md md:backdrop-blur-none
+                [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_60px,black_100%)] 
+                [mask-image:linear-gradient(to_bottom,transparent_0%,black_60px,black_100%)] 
+                md:[-webkit-mask-image:none] md:[mask-image:none] 
+                px-6 md:px-16 lg:px-24 pt-12 pb-12 transition-colors">
+
+      <div class="w-full max-w-xl mb-5 md:mb-6 shrink-0 mt-2 md:mt-0">
+        <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight drop-shadow-lg">Trainer Registration</h2>
+        <p class="text-foreground/80 text-xs md:text-sm font-medium mt-0.5 drop-shadow-md">Fill in your details to register as a trainer.</p>
+      </div>
+
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="flex flex-col w-full max-w-xl pb-0">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+
+          <div class="group relative mb-6 md:col-span-2">
+            <label class="block text-[10px] font-black uppercase text-foreground/90 mb-2 tracking-widest ml-1 drop-shadow-md">Full Name</label>
+            <div class="relative flex items-center h-14 bg-background/60 backdrop-blur-lg rounded-r-2xl shadow-lg transition-transform duration-300 focus-within:translate-x-1 border border-white/10">
+              <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-sm transition-colors duration-300"
+                [class.bg-white/20]="!isValid('full_name') && !isInvalid('full_name')"
+                [class.bg-success]="isValid('full_name')" [class.bg-danger]="isInvalid('full_name')"></div>
+              <div class="absolute left-5 text-foreground/60 group-focus-within:text-foreground transition-colors">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <input type="text" formControlName="full_name"
+                class="w-full h-full bg-primary/10 rounded-r-2xl pl-14 pr-10 text-foreground font-medium md:font-bold text-sm outline-none placeholder:text-foreground/40 placeholder:font-normal"
+                placeholder="Enter Full Name">
+            </div>
+            @if (isInvalid('full_name')) {
+            <div class="absolute -bottom-5 left-1 text-[10px] font-medium text-danger animate-pulse whitespace-nowrap drop-shadow-md">
+              @if (hasError('full_name', 'required')) { <span>Full name is required</span> }
+              @if (hasError('full_name', 'minlength')) { <span>Minimum 3 characters needed</span> }
+            </div>
+            }
+          </div>
+
+          <div class="group relative mb-6 md:col-span-2">
+            <label class="block text-[10px] font-black uppercase text-foreground/90 mb-2 tracking-widest ml-1 drop-shadow-md">Password</label>
+            <div class="relative flex items-center h-14 bg-background/60  backdrop-blur-lg rounded-r-2xl shadow-lg transition-transform duration-300 focus-within:translate-x-1 border border-white/10">
+              <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-sm transition-colors duration-300"
+                [class.bg-white/20]="!isValid('password') && !isInvalid('password')" [class.bg-success]="isValid('password')"
+                [class.bg-danger]="isInvalid('password')"></div>
+              <div class="absolute left-4 text-foreground/60 group-focus-within:text-foreground transition-colors">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <input [type]="showPassword ? 'text' : 'password'" formControlName="password"
+                class="w-full h-full bg-primary/10 rounded-r-2xl pl-12 pr-12 text-foreground font-medium md:font-bold text-sm outline-none placeholder:text-foreground/40 placeholder:font-normal tracking-widest"
+                placeholder="••••••••">
+              <button type="button" (click)="togglePassword()" 
+                class="absolute right-0 h-full w-12 flex items-center justify-center text-foreground/60 hover:text-primary transition-colors focus:outline-none cursor-pointer z-10">
+                @if (!showPassword) {
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7c.44 0 .87-.03 1.28-.09"/>
+                    <line x1="2" x2="22" y1="2" y2="22"/>
+                  </svg>
+                } @else {
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+            @if (isInvalid('password')) {
+            <div class="absolute -bottom-5 left-1 text-[10px] font-medium text-danger animate-pulse whitespace-nowrap drop-shadow-md">
+              @if (hasError('password', 'required')) { <span>Password is required</span> }
+              @if (hasError('password', 'minlength')) { <span>Password must be at least 6 characters</span> }
+            </div>
+            }
+          </div>
+
+          <div class="group relative mb-6">
+            <label class="block text-[10px] font-black uppercase text-foreground/90 mb-2 tracking-widest ml-1 drop-shadow-md">Email Address</label>
+            <div class="relative flex items-center h-14 bg-background/60  backdrop-blur-lg rounded-r-2xl shadow-lg transition-transform duration-300 focus-within:translate-x-1 border border-white/10">
+              <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-sm transition-colors duration-300"
+                [class.bg-white/20]="!isValid('email') && !isInvalid('email')" [class.bg-success]="isValid('email')"
+                [class.bg-danger]="isInvalid('email')"></div>
+              <div class="absolute left-4 text-foreground/60 group-focus-within:text-foreground transition-colors">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+              </div>
+              <input type="email" formControlName="email"
+                class="w-full h-full bg-primary/10 rounded-r-2xl pl-12 pr-10 text-foreground font-medium md:font-bold text-sm outline-none placeholder:text-foreground/40 placeholder:font-normal"
+                placeholder="Enter e-mail">
+            </div>
+            @if (isInvalid('email')) {
+            <div class="absolute -bottom-5 left-1 text-[10px] font-medium text-danger animate-pulse whitespace-nowrap drop-shadow-md">
+              @if (hasError('email', 'required')) { <span>Email is required</span> }
+              @if (hasError('email', 'email')) { <span>Invalid email</span> }
+            </div>
+            }
+          </div>
+
+          <div class="group relative mb-6">
+            <label class="block text-[10px] font-black uppercase text-foreground/90 mb-2 tracking-widest ml-1 drop-shadow-md">Phone Number</label>
+            <div class="relative flex items-center h-14 bg-background/60  backdrop-blur-lg rounded-r-2xl shadow-lg transition-transform duration-300 focus-within:translate-x-1 border border-white/10">
+              <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-sm transition-colors duration-300"
+                [class.bg-white/20]="!isValid('phone') && !isInvalid('phone')" [class.bg-success]="isValid('phone')"
+                [class.bg-danger]="isInvalid('phone')"></div>
+              <div class="absolute left-4 text-foreground/60 group-focus-within:text-foreground transition-colors">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+              </div>
+              <input type="text" formControlName="phone" (input)="onNumberInput($event, 'phone', 10)"
+                class="w-full h-full bg-primary/10 rounded-r-2xl pl-12 pr-10 text-foreground font-medium md:font-bold text-sm outline-none placeholder:text-foreground/40 placeholder:font-normal"
+                placeholder="0000000000">
+            </div>
+            @if (isInvalid('phone')) {
+            <div class="absolute -bottom-5 left-1 text-[10px] font-medium text-danger animate-pulse whitespace-nowrap drop-shadow-md">
+              @if (hasError('phone', 'required')) { <span>Phone is required</span> }
+              @if (hasError('phone', 'pattern')) { <span>10 digits required</span> }
+            </div>
+            }
+          </div>
+
+          <div class="group relative mb-6">
+            <label class="block text-[10px] font-black uppercase text-foreground/90 mb-2 tracking-widest ml-1 drop-shadow-md">Date of Birth</label>
+            <div class="relative flex items-center h-14 bg-background/60  backdrop-blur-lg rounded-r-2xl shadow-lg cursor-pointer transition-transform duration-300 hover:translate-x-1 border border-white/10"
+              (click)="openDatePicker($event)">
+              <div class="absolute left-0 top-0 bottom-0 rounded-r-2xl w-1.5 rounded-l-sm transition-colors duration-300"
+                [class.bg-white/20]="!isValid('date_of_birth') && !isInvalid('date_of_birth')"
+                [class.bg-success]="isValid('date_of_birth')" [class.bg-danger]="isInvalid('date_of_birth')"></div>
+              <div class="absolute left-4 text-foreground/60 transition-colors" [class.text-primary]="showDatePicker">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                  <line x1="16" x2="16" y1="2" y2="6" />
+                  <line x1="8" x2="8" y1="2" y2="6" />
+                  <line x1="3" x2="21" y1="10" y2="10" />
+                </svg>
+              </div>
+              <div class="w-full h-full bg-primary/10 flex items-center pl-12 pr-10 rounded-r-2xl">
+                @if (selectedDateStr) {
+                <span class="text-foreground font-medium md:font-bold text-sm tracking-wider">{{ selectedDateStr }}</span>
+                } @else {
+                <span class="text-foreground/40 text-sm">SELECT DATE</span>
+                }
+              </div>
+            </div>
+
+            @if (showDatePicker) {
+              <div class="absolute top-[105%] left-0 w-full min-w-[280px] z-50 bg-background/95 backdrop-blur-5xl border border-white/10 rounded-2xl shadow-md  p-4" 
+                   (click)="$event.stopPropagation()">
+                
+                <div class="flex items-center justify-between mb-4">
+                  @if (calendarView !== 'year') {
+                    <button type="button" (click)="goBackInCalendar()" class="text-primary text-xs font-bold uppercase tracking-wider hover:text-primary/80 transition-colors flex items-center gap-1">
+                      <span>&larr;</span> Back
+                    </button>
+                  } @else {
+                    <div></div> 
+                  }
+                  <div class="text-xs font-bold text-foreground/60 uppercase tracking-widest">
+                    @if (calendarView === 'year') { Select Year }
+                    @else if (calendarView === 'month') { Select Month }
+                    @else { Select Day }
+                  </div>
+                </div>
+
+                @if (calendarView === 'year') {
+                  <div class="grid grid-cols-4 gap-2 max-h-[200px] overflow-y-auto custom-scrollbar pr-1">
+                    @for (year of years; track year) {
+                      <div class="text-center py-2 text-sm font-medium text-foreground/80 hover:bg-primary hover:text-primary-foreground rounded-lg cursor-pointer transition-colors"
+                           (click)="selectYear(year)">
+                        {{ year }}
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (calendarView === 'month') {
+                  <div class="grid grid-cols-3 gap-2">
+                    @for (month of months; track month; let i = $index) {
+                      <div class="text-center py-3 text-sm font-medium text-foreground/80 hover:bg-primary hover:text-primary-foreground rounded-lg cursor-pointer transition-colors uppercase tracking-wider"
+                           (click)="selectMonth(i)">
+                        {{ month }}
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (calendarView === 'day') {
+                  <div class="grid grid-cols-7 gap-1 text-center">
+                    @for (d of ['Su','Mo','Tu','We','Th','Fr','Sa']; track d) {
+                       <div class="text-[10px] text-foreground/40 font-bold mb-2 uppercase">{{ d }}</div>
+                    }
+                    @for (b of blankDays; track $index) {
+                       <div></div>
+                    }
+                    @for (day of daysInMonth; track day) {
+                       <div class="py-2 text-sm font-medium text-foreground/80 hover:bg-primary hover:text-primary-foreground rounded-md cursor-pointer transition-colors"
+                            (click)="selectDay(day)">
+                         {{ day }}
+                       </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="group relative mb-6">
+            <label class="block text-[10px] font-black uppercase text-foreground/90 mb-2 tracking-widest ml-1 drop-shadow-md">Gender</label>
+            <div class="relative flex items-center h-14 bg-background/60  backdrop-blur-lg rounded-r-2xl shadow-md cursor-pointer transition-transform duration-300 hover:translate-x-1 border border-white/10"
+              (click)="toggleGenderMenu($event)">
+              <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-sm transition-colors duration-300"
+                [class.bg-white/20]="!isValid('gender') && !isInvalid('gender')" [class.bg-success]="isValid('gender')"
+                [class.bg-danger]="isInvalid('gender')"></div>
+              <div class="absolute left-4 text-foreground/60 transition-colors" [class.text-primary]="showGenderMenu">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <div class="w-full h-full bg-primary/10 rounded-r-2xl flex items-center pl-12 pr-10">
+                @if (signupForm.get('gender')?.value) {
+                <span class="text-foreground font-medium md:font-bold text-sm tracking-wider">{{ signupForm.get('gender')?.value }}</span>
+                } @else {
+                <span class="text-foreground/40 text-sm">SELECT OPTION</span>
+                }
+              </div>
+            </div>
+
+            @if (showGenderMenu) {
+              <div class="absolute top-[105%] left-0 w-full z-50 bg-background/95  backdrop-blur-5xl shadow-md  rounded-2xl  py-2 overflow-hidden border border-border " 
+                   (click)="$event.stopPropagation()">
+                @for (g of genders; track g) {
+                  <div class="px-6 py-3 text-sm font-bold text-foreground hover:bg-primary/20 hover:text-primary cursor-pointer transition-colors tracking-wide"
+                       (click)="selectGender(g)">
+                    {{ g }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="group relative mb-8 md:col-span-2">
+            <label class="block text-[10px] font-black uppercase text-foreground/90 mb-2 tracking-widest ml-1 drop-shadow-md">Home Address</label>
+            <div class="relative flex items-start rounded-r-2xl shadow-lg bg-background/60 backdrop-blur-lg  transition-transform duration-300 focus-within:translate-x-1 border border-white/10">
+              <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-sm transition-colors duration-300"
+                [class.bg-white/20]="!isValid('address') && !isInvalid('address')" [class.bg-success]="isValid('address')"
+                [class.bg-danger]="isInvalid('address')"></div>
+              <div class="absolute left-5 top-4 text-foreground/60 group-focus-within:text-foreground transition-colors">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </div>
+              <textarea formControlName="address"
+                class="w-full min-h-[90px] bg-primary/10 rounded-r-2xl pl-14 pr-10 py-4 text-foreground font-medium md:font-bold text-sm outline-none placeholder:text-foreground/40 placeholder:font-normal resize-none custom-scrollbar"
+                placeholder="Enter your full address..."></textarea>
+            </div>
+            @if (isInvalid('address')) {
+            <div class="absolute -bottom-5 left-1 text-[10px] font-medium text-danger animate-pulse whitespace-nowrap drop-shadow-md">
+              @if (hasError('address', 'required')) { <span>Address is required</span> }
+              @if (hasError('address', 'minlength')) { <span>Must be at least 10 characters</span> }
+            </div>
+            }
+          </div>
+
+        </div>
+
+        <button type="submit" [disabled]="isSubmitting()"
+          class="group w-full h-16 shrink-0 relative overflow-hidden bg-primary rounded-full shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)] hover:shadow-[0_10px_40px_rgba(var(--primary-rgb),0.5)] transition-all duration-300 hover:translate-y-[-2px] active:translate-y-[1px] disabled:opacity-70 disabled:cursor-not-allowed border border-white/20">
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+          <div class="relative flex items-center justify-center gap-3 text-primary-fg font-black text-lg uppercase tracking-widest">
+            @if (!isSubmitting()) { <span>Register Now</span> <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg> }
+            @else { <svg class="animate-spin h-6 w-6" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> }
+          </div>
+        </button>
+
+        <div class="mt-6 text-center">
+          <p class="text-[10px] text-foreground font-bold uppercase tracking-widest drop-shadow-md">Secure Trainer Registration</p>
+        </div>
+
+        <div class="mt-3 md:mt-8 text-center border-t border-foreground/20 pt-3 md:pt-6 pb-8">
+          <p class="text-xs text-foreground/90 font-medium drop-shadow-md">
+            Already have an account? <a [routerLink]=" ['/auth/login'] " class="text-primary hover:text-primary/80 font-bold transition-colors">Login</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

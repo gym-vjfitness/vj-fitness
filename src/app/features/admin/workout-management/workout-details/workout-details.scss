@@ -1,0 +1,18 @@
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+// Premium subtle pulse for active elements
+@keyframes soft-glow {
+  0% { box-shadow: 0 0 15px rgba(var(--color-primary), 0.2); }
+  50% { box-shadow: 0 0 25px rgba(var(--color-primary), 0.4); }
+  100% { box-shadow: 0 0 15px rgba(var(--color-primary), 0.2); }
+}
+
+.animate-glow {
+  animation: soft-glow 3s infinite alternate ease-in-out;
+}

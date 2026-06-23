@@ -1,0 +1,48 @@
+@keyframes wave-scroll {
+  0% { transform: translateX(0) translateZ(0) scaleY(1); }
+  50% { transform: translateX(-25%) translateZ(0) scaleY(0.85); }
+  100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-wave { animation: wave-scroll 6s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite; width: 200%; }
+.animate-wave-slow { animation: wave-scroll 10s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite; width: 200%; }
+.animate-float { animation: float 4s ease-in-out infinite; }
+
+/* Premium Glass Thumb */
+.glass-thumb {
+  background: rgba(var(--background-rgb), 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 15px rgba(0,0,0,0.15), 0 0 0 3px var(--surface);
+}
+
+/* Accordion Smooth Height */
+.accordion-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.accordion-content.expanded { grid-template-rows: 1fr; }
+.accordion-inner { overflow: hidden; }
+
+/* Mobile Scrollbar Hide */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Premium Dashboard Card */
+.bento-card {
+  background: linear-gradient(145deg, rgba(var(--surface-rgb), 0.95) 0%, rgba(var(--surface-rgb), 0.7) 100%);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(var(--border-rgb), 0.6);
+  box-shadow: 0 8px 30px -5px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -5px rgba(0,0,0,0.08);
+}

@@ -1,0 +1,82 @@
+@layer utilities {
+  /* 1. Uncontrolled Erratic Needle Movement */
+  @keyframes needle-erratic {
+    0%   { transform: rotate(0deg); }
+    12%  { transform: rotate(50deg); }
+    20%  { transform: rotate(20deg); }
+    35%  { transform: rotate(110deg); }
+    45%  { transform: rotate(80deg); }
+    60%  { transform: rotate(175deg); } /* Hits Danger */
+    65%  { transform: rotate(155deg); }
+    75%  { transform: rotate(185deg); } /* Pushes past the limit */
+    80%  { transform: rotate(170deg); }
+    85%  { transform: rotate(180deg); }
+    95%  { transform: rotate(175deg); }
+    100% { transform: rotate(0deg); }   /* Drops the weight, loop restarts */
+  }
+
+  .animate-needle-erratic {
+    /* Fast 3.5s loop for high intensity */
+    animation: needle-erratic 3.5s infinite;
+    will-change: transform;
+  }
+
+  /* 2. Syncing the Red Danger Track to the Needle */
+  @keyframes meter-erratic {
+    0%   { stroke-dashoffset: 126; }
+    12%  { stroke-dashoffset: 90; }
+    20%  { stroke-dashoffset: 110; }
+    35%  { stroke-dashoffset: 45; }
+    45%  { stroke-dashoffset: 70; }
+    60%  { stroke-dashoffset: 5; }
+    65%  { stroke-dashoffset: 20; }
+    75%  { stroke-dashoffset: 0; }
+    80%  { stroke-dashoffset: 10; }
+    85%  { stroke-dashoffset: 0; }
+    95%  { stroke-dashoffset: 5; }
+    100% { stroke-dashoffset: 126; }
+  }
+
+  .animate-meter-erratic {
+    stroke-dasharray: 126;
+    animation: meter-erratic 3.5s infinite;
+  }
+
+  /* 3. The "Muscle Tremor" for the 404 */
+  @keyframes muscle-tremor {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-1px, -2px); }
+    20% { transform: translate(2px, 1px); }
+    30% { transform: translate(-2px, 2px); }
+    40% { transform: translate(1px, -1px); }
+    50% { transform: translate(-1px, 2px); }
+    60% { transform: translate(2px, -2px); }
+    70% { transform: translate(-2px, -1px); }
+    80% { transform: translate(1px, 2px); }
+    90% { transform: translate(-1px, -1px); }
+  }
+
+  .animate-muscle-tremor {
+    animation: muscle-tremor 0.3s ease-in-out infinite;
+  }
+
+  /* 4. Glowing Energy Burst emitting from the 404 */
+  @keyframes energy-burst {
+    0% { transform: scale(1); opacity: 0.5; filter: blur(4px); }
+    100% { transform: scale(1.15); opacity: 0; filter: blur(12px); }
+  }
+
+  .animate-energy-burst {
+    animation: energy-burst 2s ease-out infinite;
+  }
+
+  /* 5. Warning Badge Pulse */
+  @keyframes pulse-fast {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .animate-pulse-fast {
+    animation: pulse-fast 0.8s ease-in-out infinite;
+  }
+}

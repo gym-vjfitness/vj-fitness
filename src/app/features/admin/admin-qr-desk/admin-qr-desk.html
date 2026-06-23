@@ -1,0 +1,70 @@
+<div class="w-full h-full bg-background text-foreground flex flex-col items-center justify-center p-4 selection:bg-primary/20 theme-transitioning overflow-hidden">
+
+    <div class="text-center mb-10 flex flex-col items-center">
+        <div class="inline-flex items-center gap-2 bg-surface border border-border px-4 py-1.5 rounded-full mb-4 shadow-sm">
+            <div class="w-2 h-2 rounded-full animate-pulse" [ngClass]="isDangerTime() ? 'bg-danger' : 'bg-success'"></div>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-muted">Live Sync Active</span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight mb-2">Scan to Check-in</h1>
+        <p class="text-muted text-sm font-medium max-w-xs">Open your member app and scan this secure pass.</p>
+    </div>
+
+    <div #fullscreenArea class="fullscreen-container relative w-full max-w-[280px] sm:max-w-[320px] aspect-square flex items-center justify-center bg-transparent">
+        
+        @if (!isFullscreen()) {
+        <button (click)="toggleFullScreen()" class="absolute -top-14 right-0 p-2 rounded-full bg-success/20 border border-success/40 hover:border-sucess/70 text-success shadow-sm transition-all active:scale-90 cursor-pointer z-30">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+            </svg>
+        </button>
+        }
+
+        @if (isFullscreen()) {
+       
+            <button (click)="toggleFullScreen()" class=" max-w-max absolute top-1! right-1!  fullscreen-close-btn p-3 rounded-full bg-danger/10 border border-danger/40 text-danger shadow-lg transition-all active:scale-90 cursor-pointer z-50">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6 text-danger">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        }
+
+        <div class="qr-bounding-box relative w-full h-full flex items-center justify-center">
+            
+            <div class="absolute inset-0 rounded-[12%] transition-all duration-1000 ease-in-out"
+                 [style.box-shadow]="isDangerTime() 
+                    ? '0 0 50px 8px color-mix(in srgb, var(--danger) 40%, transparent)' 
+                    : '0 0 50px 8px color-mix(in srgb, var(--primary) 40%, transparent)'">
+            </div>
+
+            <div class="absolute inset-0 bg-white rounded-[12%] flex items-center justify-center overflow-hidden shadow-xl p-3 border border-border/50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] z-10"
+                 [class.scale-95]="isUpdating()"
+                 [class.opacity-50]="isUpdating()"
+                 [class.scale-100]="!isUpdating()"
+                 [class.opacity-100]="!isUpdating()">
+                
+                <div #qrContainer class="qr-canvas-wrapper w-full h-full flex items-center justify-center"></div>
+            </div>
+
+            <svg class="absolute inset-0 w-full h-full pointer-events-none drop-shadow-md z-20 overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <rect x="0" y="0" width="100" height="100" rx="12" fill="none" class="stroke-surface opacity-50" stroke-width="1.5"></rect>
+                
+                <rect x="0" y="0" width="100" height="100" rx="12" fill="none" 
+                      [style.stroke]="isDangerTime() ? 'var(--danger)' : 'var(--primary)'"
+                      stroke-width="2" stroke-linecap="round" 
+                      pathLength="100" 
+                      class="progress-ring transform origin-center -rotate-90"
+                      [class.animate-progress]="!isUpdating()"></rect>
+            </svg>
+        </div>
+    </div>
+
+    <div class="mt-10 flex flex-col items-center">
+        <span class="text-xs font-bold uppercase tracking-widest mb-1 transition-colors duration-300" [ngClass]="isDangerTime() ? 'text-muted' : 'text-success'">Code Expires In</span>
+        <span class="text-5xl font-mono font-black tracking-tighter transition-colors duration-300" 
+              [ngClass]="isDangerTime() ? 'text-danger' : 'text-foreground'">
+            00:{{ refreshCountdown() < 10 ? '0' + refreshCountdown() : refreshCountdown() }}
+        </span>
+    </div>
+
+</div>

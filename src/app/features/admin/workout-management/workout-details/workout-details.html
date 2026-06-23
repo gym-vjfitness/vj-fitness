@@ -1,0 +1,493 @@
+<div class="h-full bg-[var(--background)] text-[var(--foreground)]">
+
+    @if (isLoading()) {
+    <div class="relative flex min-h-[70vh] flex-col items-center justify-center px-4 overflow-hidden">
+        <div class="pointer-events-none absolute h-48 w-48 rounded-full bg-[var(--primary)]/15 blur-[50px]"></div>
+
+        <div class="relative flex h-24 w-24 items-center justify-center">
+            <div
+                class="absolute inset-0 animate-[spin_4s_linear_infinite] rounded-full border border-dashed border-[var(--border)]/80">
+            </div>
+            <div
+                class="absolute inset-2 animate-[spin_1.5s_cubic-bezier(0.4,0,0.2,1)_infinite] rounded-full border-[3px] border-transparent border-t-[var(--primary)] border-r-[var(--primary)]/30">
+            </div>
+            <div
+                class="absolute inset-6 animate-[spin_2s_linear_infinite_reverse] rounded-full border-2 border-transparent border-b-[var(--accent)] border-l-[var(--accent)]/40">
+            </div>
+            <div
+                class="flex h-8 w-8 animate-pulse items-center justify-center rounded-full bg-[var(--primary)]/10 ring-1 ring-[var(--primary)]/30 text-[var(--primary)] backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)]">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div class="mt-8 flex flex-col items-center gap-3 relative z-10">
+            <p class="animate-pulse text-[10px] font-black uppercase tracking-[0.4em] text-[var(--foreground)]/90">
+                Loading Protocol
+            </p>
+            <div class="flex items-center gap-1.5 opacity-60">
+                <div class="h-1 w-1 animate-ping rounded-full bg-[var(--primary)]"></div>
+                <div class="h-1 w-1 animate-pulse rounded-full bg-[var(--accent)]"></div>
+                <div class="h-1 w-1 animate-ping rounded-full bg-[var(--secondary)]"></div>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (errorMsg()) {
+    <div
+        class="mx-4 mt-6 relative overflow-hidden rounded-[32px] border border-[var(--danger)]/30 bg-[var(--surface)]/60 p-6 shadow-[0_20px_40px_rgba(239,68,68,0.06)] backdrop-blur-xl sm:mx-6 lg:mx-8">
+        <div
+            class="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-[var(--danger)]/15 blur-[40px]">
+        </div>
+        <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-end opacity-[0.03]">
+            <svg viewBox="0 0 100 100" class="h-48 w-48 translate-x-12 translate-y-4 -rotate-12">
+                <path d="M50 10 L90 90 L10 90 Z" fill="none" stroke="currentColor" stroke-width="4"
+                    stroke-linejoin="round" />
+                <line x1="50" y1="35" x2="50" y2="65" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                <circle cx="50" cy="80" r="4" fill="currentColor" />
+            </svg>
+        </div>
+        <div class="relative z-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+            <div
+                class="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[var(--danger)]/20 bg-[var(--danger)]/10 shadow-inner">
+                <div class="absolute inset-0 animate-pulse rounded-2xl ring-1 ring-inset ring-[var(--danger)]/20"></div>
+                <svg class="h-6 w-6 text-[var(--danger)] drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--danger)]/80">
+                    Protocol Interrupted
+                </p>
+                <h3 class="mt-1 text-lg font-bold text-[var(--foreground)]">
+                    System Error Encountered
+                </h3>
+                <p class="mt-1.5 text-sm font-medium leading-relaxed text-[var(--muted)]">
+                    {{ errorMsg() }}
+                </p>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if (isUnassigned()) {
+    <div class="h-full min-h-[80vh] bg-background flex flex-col items-center justify-center px-6 relative overflow-hidden selection:bg-danger/20">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-danger/5 rounded-full blur-[80px]"></div>
+
+        <div class="relative z-10 flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-500 max-w-sm">
+
+            <div class="w-24 h-24 rounded-[2rem] bg-surface border border-border/50 text-muted flex items-center justify-center mb-6 shadow-inner relative overflow-hidden group">
+                <div class="absolute inset-0 border border-danger/20 rounded-[2rem]"></div>
+                <svg class="w-10 h-10 text-danger/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+
+            <h2 class="text-3xl font-black uppercase tracking-tighter text-foreground mb-3 leading-none">
+                workout-Plan <br><span class="text-danger">Not Assigned</span>
+            </h2>
+
+            <p class="text-sm font-medium text-muted mb-8 leading-relaxed">
+                Your profile currently does not have an active nutritional protocol. Please contact your trainer or administrator to initialize a diet plan.
+            </p>
+
+            <button [routerLink]="['/member/dashboard']" class="px-8 py-3.5 rounded-full bg-surface border border-danger/40 text-[11px] font-black uppercase tracking-[0.2em] text-foreground hover:bg-background transition-colors shadow-sm focus:ring-2 focus:ring-danger/50 focus:outline-none">
+                Return to Dashboard
+            </button>
+        </div>
+    </div>
+    }
+
+    @if (!isLoading() && workoutPlan() && !isUnassigned()) {
+    <div class="mx-auto w-full max-w-6xl pb-28">
+        <section class="px-4 pt-4 sm:px-6 lg:px-8">
+            <div
+                class="relative overflow-hidden rounded-[34px] border border-[var(--border)]/70 bg-[var(--surface)] p-5 shadow-[0_24px_80px_rgba(15,23,42,0.10)] sm:p-6 lg:p-8">
+                <div
+                    class="pointer-events-none absolute -top-20 right-0 h-56 w-56 rounded-full bg-[var(--primary)]/15 blur-3xl">
+                </div>
+                <div
+                    class="pointer-events-none absolute -bottom-20 left-0 h-56 w-56 rounded-full bg-[var(--accent)]/10 blur-3xl">
+                </div>
+                <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.03]">
+                    <svg viewBox="0 0 100 100" class="h-[120%] w-[120%] -rotate-12">
+                        <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" stroke-width="1.5" />
+                        <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="1.5"
+                            stroke-dasharray="4 4" />
+                        <circle cx="50" cy="50" r="50" fill="none" stroke="currentColor" stroke-width="1" />
+                        <line x1="0" y1="50" x2="100" y2="50" stroke="currentColor" stroke-width="0.5"
+                            stroke-dasharray="2 4" />
+                        <line x1="50" y1="0" x2="50" y2="100" stroke="currentColor" stroke-width="0.5"
+                            stroke-dasharray="2 4" />
+                    </svg>
+                </div>
+
+                <div class="relative z-10 ">
+                    <div class="w-full flex justify-end mb-2 ">
+                        <span
+                            class="relative overflow-hidden inline-flex items-center justify-end rounded-full border border-[var(--primary)]/20 bg-[var(--primary)]/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--primary)]">
+                            <div
+                                class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.08]">
+                                <svg viewBox="0 0 100 100" class="h-6 w-6">
+                                    <polygon points="50,10 90,50 50,90 10,50" fill="none" stroke="currentColor"
+                                        stroke-width="8" />
+                                </svg>
+                            </div>
+                            <span class="relative z-10">Premium</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-start gap-3">
+                        <span
+                            class="relative overflow-hidden inline-flex items-center gap-2 rounded-full border border-accent/50 bg-[var(--background)]/50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] shadow-lg">
+                            <div
+                                class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+                                <svg viewBox="0 0 100 100" class="h-8 w-8">
+                                    <path d="M20 80 L80 20 M30 90 L90 30 M10 70 L70 10" stroke="currentColor"
+                                        stroke-width="8" stroke-linecap="round" />
+                                </svg>
+                            </div>
+                            <span class="relative z-10 block ">Workout Plan</span>
+                        </span>
+
+                        <button type="button" (click)="forceReload()" [disabled]="isReloadDisabled()"
+                            [title]="isReloadDisabled() ? 'Reload disabled for 1 hour after recent fetch' : 'Force reload data'"
+                            class="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border)]/70 bg-[var(--background)] text-[var(--muted)] shadow-sm transition-all hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] hover:border-[var(--primary)]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--background)] disabled:hover:text-[var(--muted)] disabled:hover:border-[var(--border)]/70 focus:outline-none">
+                            <svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="mt-4 space-y-3">
+                        <h1 class="text-3xl font-black tracking-tight text-[var(--foreground)] sm:text-4xl lg:text-5xl">
+                            {{ workoutPlan()!.heading }}
+                        </h1>
+                        <p class="max-w-2xl text-sm leading-6 text-[var(--muted)] sm:text-base">
+                            {{ workoutPlan()!.description }}
+                        </p>
+                    </div>
+
+                    <div class="mt-5 flex flex-wrap gap-2">
+                        <span
+                            class="relative overflow-hidden inline-flex items-center gap-2 rounded-full border border-[var(--primary)]/20 bg-[var(--primary)]/10 px-3 py-1.5 text-[11px] font-semibold text-[var(--primary)]">
+                            <div
+                                class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.08]">
+                                <svg viewBox="0 0 100 100" class="h-6 w-6">
+                                    <path d="M50 10 v80 M10 50 h80 M20 20 l60 60 M20 80 l60 -60" stroke="currentColor"
+                                        stroke-width="6" stroke-linecap="round" />
+                                </svg>
+                            </div>
+                            <svg class="relative z-10 h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="relative z-10">{{ workoutPlan()!.goal_type }}</span>
+                        </span>
+
+                        <span
+                            class="relative overflow-hidden inline-flex items-center gap-2 rounded-full border border-[var(--accent)]/20 bg-[var(--accent)]/10 px-3 py-1.5 text-[11px] font-semibold text-[var(--accent)]">
+                            <div
+                                class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.08]">
+                                <svg viewBox="0 0 100 100" class="h-6 w-6">
+                                    <path d="M20 70 L50 40 L80 70 M20 40 L50 10 L80 40" fill="none"
+                                        stroke="currentColor" stroke-width="8" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <svg class="relative z-10 h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <span class="relative z-10">{{ workoutPlan()!.difficulty_level }}</span>
+                        </span>
+
+                        <span
+                            class="relative overflow-hidden inline-flex items-center gap-2 rounded-full border border-[var(--secondary)]/20 bg-[var(--secondary)]/10 px-3 py-1.5 text-[11px] font-semibold text-[var(--secondary)]">
+                            <div
+                                class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.08]">
+                                <svg viewBox="0 0 100 100" class="h-6 w-6">
+                                    <circle cx="50" cy="30" r="15" fill="none" stroke="currentColor" stroke-width="6" />
+                                    <circle cx="30" cy="65" r="15" fill="none" stroke="currentColor" stroke-width="6" />
+                                    <circle cx="70" cy="65" r="15" fill="none" stroke="currentColor" stroke-width="6" />
+                                </svg>
+                            </div>
+                            <svg class="relative z-10 h-3.5 w-3.5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
+                            </svg>
+                            <span class="relative z-10">{{ workoutPlan()!.target_audience }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section
+            class="sticky top-0 z-30 mt-4 border-y border-[var(--border)]/60 bg-[var(--background)]/85 backdrop-blur-xl">
+            <div class="px-4 py-3 sm:px-6 lg:px-8">
+                <div class="hide-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1">
+                    @for (day of enrichedDays(); track $index) {
+                    <button (click)="selectDay($index)"
+                        class="relative overflow-hidden min-w-[92px] snap-start rounded-[26px] border px-4 py-4 text-center transition duration-300 ease-out"
+                        [ngClass]="selectedDayIndex() === $index
+                  ? 'border-[var(--primary)]/45 bg-[var(--primary)]/10 shadow-[0_16px_36px_rgba(59,130,246,0.22)] ring-1 ring-[var(--primary)]/25'
+                  : 'border-[var(--border)]/70 bg-[var(--surface)] shadow-[0_10px_24px_rgba(15,23,42,0.07)] hover:-translate-y-0.5 hover:border-[var(--primary)]/30 hover:bg-[var(--primary)]/5'">
+                        <div
+                            class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+                            <svg viewBox="0 0 100 100" class="h-16 w-16 -rotate-45">
+                                <path d="M20 50 A30 30 0 0 1 80 50" fill="none" stroke="currentColor" stroke-width="8" />
+                                <path d="M35 50 A15 15 0 0 1 65 50" fill="none" stroke="currentColor" stroke-width="8" />
+                            </svg>
+                        </div>
+                        <div class="relative z-10 mx-auto flex h-9 w-9 items-center justify-center rounded-full text-[11px] font-black"
+                            [ngClass]="selectedDayIndex() === $index
+                    ? 'bg-[var(--primary)] text-[var(--primary-fg)]'
+                    : 'bg-[var(--background)] text-[var(--foreground)] ring-1 ring-[var(--border)]'">
+                            {{ $index + 1 }}
+                        </div>
+                        <p
+                            class="relative z-10 mt-2 text-[12px] font-black uppercase tracking-[0.22em] text-[var(--foreground)]">
+                            {{ day.dayName | slice:0:3 | uppercase }}
+                        </p>
+                    </button>
+                    }
+                </div>
+            </div>
+        </section>
+
+        @if (activeDay(); as day) {
+        <section class="px-4 pt-4 sm:px-6 lg:px-8">
+            <div
+                class="relative overflow-hidden rounded-[30px] border border-[var(--border)]/70 bg-[var(--surface)] p-4 shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+                <div
+                    class="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[var(--primary)]/10 blur-3xl">
+                </div>
+                <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-start opacity-[0.04]">
+                    <svg viewBox="0 0 100 100" class="h-32 w-32 -rotate-12 -translate-x-8">
+                        <path d="M50 90 C 10 90, 10 40, 50 10 C 90 40, 90 90, 50 90 Z" fill="none" stroke="currentColor"
+                            stroke-width="4" />
+                    </svg>
+                </div>
+                <div class="relative z-10 flex items-end justify-between gap-4">
+                    <div>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--muted)]">Today’s focus</p>
+                        <h3 class="mt-1 text-2xl font-black tracking-tight text-[var(--foreground)]">{{ day.focusMuscle }}</h3>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-medium text-[var(--muted)]">Exercises</p>
+                        <p class="text-lg font-semibold text-[var(--foreground)]">{{ day.exercises.length }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        @if (day.dayNotes) {
+        <section class="px-4 pt-4 sm:px-6 lg:px-8">
+            <div class="relative overflow-hidden rounded-[28px] border border-[var(--border)]/70 bg-[var(--surface)] p-5 shadow-[0_14px_40px_rgba(15,23,42,0.06)]">
+                <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-end opacity-[0.03]">
+                    <svg viewBox="0 0 100 100" class="h-24 w-24 translate-x-6">
+                        <path d="M30 20 h40 v60 h-40 z" fill="none" stroke="currentColor" stroke-width="4" />
+                        <path d="M40 40 h20 M40 55 h20" stroke="currentColor" stroke-width="4" />
+                    </svg>
+                </div>
+                <div class="relative z-10">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-[var(--muted)]">
+                        Coach Notes
+                    </p>
+                    <p class="mt-3 text-sm leading-6 text-[var(--muted)]">
+                        {{ day.dayNotes }}
+                    </p>
+                </div>
+            </div>
+        </section>
+        }
+
+        <section class="px-4 py-5 sm:px-6 lg:px-8">
+            <div class="space-y-4">
+                @for (ex of day.exercises; track $index; let eIndex = $index) {
+                <details
+                    class="group overflow-hidden rounded-[32px] border border-[var(--border)]/70 bg-[var(--surface)] shadow-[0_14px_40px_rgba(15,23,42,0.06)] transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_20px_55px_rgba(15,23,42,0.10)] relative">
+
+                    <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-end opacity-[0.03]">
+                        <svg viewBox="0 0 100 100" class="h-64 w-64 rotate-12 translate-x-12">
+                            <g transform="rotate(-45 50 50)">
+                                <rect x="15" y="40" width="15" height="20" fill="none" stroke="currentColor" stroke-width="4" />
+                                <rect x="70" y="40" width="15" height="20" fill="none" stroke="currentColor" stroke-width="4" />
+                                <line x1="30" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="6" />
+                            </g>
+                        </svg>
+                    </div>
+
+                    <summary class="relative z-10 list-none cursor-pointer p-4 sm:p-5 [&::-webkit-details-marker]:hidden">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--primary)]/10 text-[var(--primary)] ring-1 ring-[var(--primary)]/15">
+                                    <span class="text-sm font-black">{{ eIndex + 1 }}</span>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-1">
+                                    <h4 class="text-[1.1rem] font-extrabold leading-7 tracking-tight text-[var(--foreground)] sm:text-[1.35rem] sm:leading-8">
+                                        {{ ex.details?.name || ex.name || 'Protocol Data Missing' }}
+                                    </h4>
+                                </div>
+                                <div
+                                    class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[var(--border)]/70 bg-[var(--background)] text-[var(--primary)]">
+                                    <svg class="h-5 w-5 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-nowrap items-center gap-2 overflow-hidden w-full">
+                                @if (ex.details?.target_muscle_group) {
+                                <span class="relative overflow-hidden inline-flex items-center gap-1.5 rounded-full border border-[var(--border)]/70 bg-[var(--background)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] shadow-sm shrink-0">
+                                    <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+                                        <svg viewBox="0 0 100 100" class="h-8 w-8">
+                                            <path d="M10 50 l20 -30 l40 60 l20 -30" fill="none" stroke="currentColor" stroke-width="6" />
+                                        </svg>
+                                    </div>
+                                    <svg class="relative z-10 h-3 w-3 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="relative z-10 w-[1px] h-2.5 bg-current opacity-30"></span>
+                                    <span class="relative z-10">{{ ex.details?.target_muscle_group }}</span>
+                                </span>
+                                }
+                                @if (ex.details?.equipment_required) {
+                                <span class="relative overflow-hidden inline-flex items-center gap-1.5 rounded-full border border-[var(--border)]/70 bg-[var(--background)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] shadow-sm shrink-0 truncate">
+                                    <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+                                        <svg viewBox="0 0 100 100" class="h-8 w-8">
+                                            <polygon points="50,15 85,35 85,65 50,85 15,65 15,35" fill="none" stroke="currentColor" stroke-width="6" />
+                                        </svg>
+                                    </div>
+                                    <svg class="relative z-10 h-3 w-3 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    </svg>
+                                    <span class="relative z-10 w-[1px] h-2.5 bg-current opacity-30"></span>
+                                    <span class="relative z-10">{{ ex.details?.equipment_required }}</span>
+                                </span>
+                                }
+                            </div>
+                        </div>
+                    </summary>
+
+                    <div class="relative z-10 border-t border-[var(--border)]/60 px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
+                        <div class="relative overflow-hidden rounded-[24px] border border-[var(--border)]/70 bg-[var(--background)]/80 p-4">
+                            <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.02]">
+                                <svg viewBox="0 0 100 100" class="h-48 w-48">
+                                    <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="2" />
+                                    <rect x="20" y="20" width="60" height="60" fill="none" stroke="currentColor" stroke-width="2" transform="rotate(45 50 50)" />
+                                </svg>
+                            </div>
+
+                            <div class="relative z-10 flex items-center justify-between gap-4">
+                                <span class="relative overflow-hidden inline-flex items-center gap-1.5 rounded-full bg-[var(--success)]/10 border border-[var(--success)]/20 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-[var(--success)] shadow-sm">
+                                    <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+                                        <svg viewBox="0 0 100 100" class="h-6 w-6">
+                                            <path d="M20 30 h60 M20 50 h60 M20 70 h60" stroke="currentColor" stroke-width="8" stroke-linecap="round" />
+                                        </svg>
+                                    </div>
+                                    <svg class="relative z-10 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span class="relative z-10">{{ ex.sets }} sets total</span>
+                                </span>
+
+                                @if (ex.details?.video_url || ex.videoUrl) {
+                                <button type="button" (click)="playVideo(ex.details?.video_url || ex.videoUrl); $event.stopPropagation()" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--primary)]/30 bg-[var(--primary)]/10 text-[var(--primary)] shadow-sm transition duration-300 hover:border-[var(--primary)]/60 hover:bg-[var(--primary)]/20 hover:scale-105" aria-label="Play exercise video">
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </button>
+                                }
+                            </div>
+
+                            <div class="relative z-10 mt-5 flex flex-wrap items-center gap-x-1.5 gap-y-3 sm:gap-3">
+                                @for (target of ex.setDetails; track $index; let isLast = $last) {
+                                    @if (!isLast) {
+                                    <div class="drop-shadow-[1.5px_0_0_var(--primary)] transition-transform hover:-translate-y-0.5 w-[28%] min-w-[70px] sm:w-[85px]">
+                                        <div class="relative overflow-hidden inline-flex h-8 w-full items-center gap-1 bg-[var(--surface)] border-y border-l border-[var(--border)]/70 pl-2 pr-4 text-[var(--foreground)]" style="clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%); border-radius: 8px 0 0 8px;">
+                                            <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+                                                <svg viewBox="0 0 100 100" class="h-8 w-8">
+                                                    <path d="M40 100 L80 0 M20 100 L60 0" stroke="currentColor" stroke-width="8" />
+                                                </svg>
+                                            </div>
+                                            <div class="relative z-10 flex items-center gap-1 w-full">
+                                                @if (ex.trackingType === 'time') {
+                                                <svg class="h-3.5 w-3.5 shrink-0 text-[var(--warning)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                } @else {
+                                                <svg class="h-3.5 w-3.5 shrink-0 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                </svg>
+                                                }
+                                                <span class="text-xs font-black truncate">{{ target }}{{ ex.trackingType === 'time' ? 's' : '' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    } @else {
+                                    <div class="relative overflow-hidden inline-flex h-8 w-[28%] min-w-[70px] sm:w-[80px] items-center gap-1.5 rounded-lg border border-[var(--border)]/70 bg-[var(--surface)] px-2 shadow-sm transition-transform hover:-translate-y-0.5">
+                                        <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+                                            <svg viewBox="0 0 100 100" class="h-6 w-6">
+                                                <path d="M20 50 l20 20 l40 -40" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        </div>
+                                        <div class="relative z-10 flex items-center gap-1 w-full">
+                                            @if (ex.trackingType === 'time') {
+                                            <svg class="h-3.5 w-3.5 shrink-0 text-[var(--warning)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            } @else {
+                                            <svg class="h-3.5 w-3.5 shrink-0 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                            </svg>
+                                            }
+                                            <span class="text-xs font-black text-[var(--foreground)] truncate">{{ target }}{{ ex.trackingType === 'time' ? 's' : '' }}</span>
+                                        </div>
+                                    </div>
+                                    }
+                                }
+                            </div>
+
+                            @if (ex.restSeconds) {
+                            <div class="relative overflow-hidden z-10 mt-5 inline-flex items-center gap-2 rounded-full border border-[var(--info)]/20 bg-[var(--info)]/10 px-3 py-1.5 text-xs font-semibold text-[var(--info)] shadow-sm">
+                                <div class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.06]">
+                                    <svg viewBox="0 0 100 100" class="h-6 w-6">
+                                        <path d="M10 50 Q 30 20 50 50 T 90 50" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" />
+                                    </svg>
+                                </div>
+                                <svg class="relative z-10 h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="relative z-10">{{ ex.restSeconds }}s rest</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </details>
+                }
+            </div>
+        </section>
+        }
+    </div>
+    }
+</div>
+
+@if (activeVideoUrl(); as url) {
+<div class="fixed inset-0 z-[100] flex items-center justify-center   animate-in fade-in duration-300">
+    <div class="absolute inset-0" (click)="closeVideoModal()"></div>
+    <div class="relative z-10 w-full max-w-4xl p-4 sm:p-6 animate-in zoom-in-95 duration-300">
+        <app-video-player [videoUrl]="url" (closeModal)="closeVideoModal()"></app-video-player>
+    </div>
+</div>
+}

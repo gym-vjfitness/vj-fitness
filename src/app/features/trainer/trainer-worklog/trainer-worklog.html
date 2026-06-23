@@ -1,0 +1,310 @@
+<div class="fixed inset-0 pointer-events-none z-[-1] bg-background overflow-hidden">
+  <div class="absolute top-[-20%] left-[-20%] w-[70%] h-[70%] bg-primary/10 blur-[120px] rounded-full"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-accent/10 blur-[100px] rounded-full"></div>
+  <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 24px 24px;"></div>
+</div>
+
+<div class="h-full text-foreground font-sans pb-4 relative z-0 selection:bg-primary/30 overflow-y-auto ">
+  
+  <header class="pt-12 pb-6 px-6 relative z-10">
+    <div class="max-w-5xl mx-auto">
+      <div class="relative">
+        <h1 class="text-[5rem] sm:text-[7rem] font-black uppercase tracking-tighter text-foreground/5 leading-none absolute -top-8 -left-2 select-none pointer-events-none">PERFORM</h1>
+        
+        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          Trainer Command
+        </p>
+        <h2 class="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-foreground leading-none">Worklog</h2>
+      </div>
+
+      <div class="flex gap-1.5 w-full bg-surface/40 p-1.5 rounded-full border border-border/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl mt-8">
+        <button (click)="setTab('submit')" class="flex-1 rounded-full px-2 py-3.5 text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300" [class]="ops.trainerActiveTab() === 'submit' ? 'bg-foreground text-background shadow-lg scale-[1.02]' : 'text-muted hover:text-foreground'">
+          Submit
+        </button>
+        <button (click)="setTab('attendance')" class="flex-1 rounded-full px-2 py-3.5 text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300" [class]="ops.trainerActiveTab() === 'attendance' ? 'bg-foreground text-background shadow-lg scale-[1.02]' : 'text-muted hover:text-foreground'">
+          Status
+        </button>
+        <button (click)="setTab('payments')" class="flex-1 rounded-full px-2 py-3.5 text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300" [class]="ops.trainerActiveTab() === 'payments' ? 'bg-foreground text-background shadow-lg scale-[1.02]' : 'text-muted hover:text-foreground'">
+          Payouts
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto p-5 sm:p-6 space-y-6 mt-2 relative">
+    
+    @if (ops.trainerActiveTab() === 'submit') {
+      <section class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        
+        <div class="grid grid-cols-3 gap-3">
+          @for (date of allowedDates; track date.id) {
+            <button (click)="attendanceDate.set(date.id)" class="rounded-[2rem] border border-border/50 p-4 text-center transition-all duration-300 backdrop-blur-md overflow-hidden relative"
+              [class]="attendanceDate() === date.id ? 'bg-primary/10 border-primary shadow-[0_0_20px_rgba(59,130,246,0.15)] scale-[1.02]' : 'bg-surface/30 hover:bg-surface/50'">
+              @if (attendanceDate() === date.id) {
+                <div class="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+              }
+              <p class="text-[11px] sm:text-xs font-black uppercase tracking-wider" [class.text-primary]="attendanceDate() === date.id">{{ date.label }}</p>
+              <p class="text-[9px] font-bold text-muted mt-1 uppercase tracking-widest">{{ date.id | date:'MMM dd' }}</p>
+            </button>
+          }
+        </div>
+
+        <div class="bg-surface/30 border border-border/50 rounded-[2.5rem] p-5 sm:p-6 backdrop-blur-md shadow-lg">
+          <label class="text-[9px] font-black uppercase tracking-[0.2em] text-muted block mb-4 pl-2">Target Shift</label>
+          <div class="grid grid-cols-2 gap-3 sm:gap-4">
+            <button (click)="openClock('start')" class="rounded-[2rem] bg-background/50 border border-border/80 p-5 sm:p-6 text-left active:scale-95 transition-transform hover:border-primary/50 flex flex-col justify-between min-h-[110px]">
+              <span class="text-[9px] font-black uppercase tracking-[0.2em] text-primary block mb-2">Start</span>
+              <span class="text-2xl sm:text-3xl font-black text-foreground tracking-tighter">{{ format12Hour(startTime()) }}</span>
+            </button>
+            <button (click)="openClock('end')" class="rounded-[2rem] bg-background/50 border border-border/80 p-5 sm:p-6 text-left active:scale-95 transition-transform hover:border-primary/50 flex flex-col justify-between min-h-[110px]">
+              <span class="text-[9px] font-black uppercase tracking-[0.2em] text-primary block mb-2">End</span>
+              <span class="text-2xl sm:text-3xl font-black text-foreground tracking-tighter">{{ format12Hour(endTime()) }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="rounded-[2.5rem] bg-surface border border-border/50 p-6 sm:p-8 mt-6 shadow-2xl relative overflow-hidden backdrop-blur-xl">
+          <div class="absolute -top-12 -right-12 w-40 h-40 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="flex items-center justify-between border-b border-border/50 pb-6 mb-6">
+            <div>
+              <p class="text-[9px] font-black uppercase tracking-[0.2em] text-muted">Net Active Time</p>
+              <p class="text-[3rem] font-black mt-1 leading-none tracking-tighter" [class.text-danger]="!shiftStatus().valid" [class.text-primary]="shiftStatus().valid">
+                {{ shiftStatus().netString }}
+              </p>
+            </div>
+            @if (!shiftStatus().valid) {
+              <div class="w-12 h-12 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center text-danger animate-pulse">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              </div>
+            }
+          </div>
+
+          @if (!shiftStatus().valid) {
+            <p class="text-[10px] font-black uppercase tracking-widest text-danger mb-5">{{ shiftStatus().error }}</p>
+          }
+          
+          <button (click)="submitAttendance()" [disabled]="!shiftStatus().valid || isSubmitting()" class="w-full rounded-full bg-foreground text-background px-6 py-5 text-[11px] font-black uppercase tracking-[0.2em] disabled:opacity-30 transition-all hover:scale-[1.02] shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+            {{ isSubmitting() ? 'PROCESSING...' : 'LOG WORKOUT SHIFT' }}
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (ops.trainerActiveTab() === 'attendance') {
+      <section class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        
+        <div class="rounded-[2.5rem] bg-primary text-primary-fg p-6 sm:p-8 shadow-[0_20px_50px_-12px_rgba(59,130,246,0.5)] relative overflow-hidden">
+          <div class="absolute -top-20 -right-20 w-64 h-64 bg-white/20 rounded-full blur-[80px] pointer-events-none"></div>
+          <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+          
+          <div class="relative z-10">
+            <p class="text-[9px] font-black uppercase tracking-[0.2em] text-primary-fg/80">Total Active Hours</p>
+            <p class="text-4xl sm:text-5xl font-black mt-1 tracking-tighter">{{ ops.trainerAttendanceSnapshot()?.current_month_hours || 0 }}<span class="text-2xl text-primary-fg/60 ml-1 tracking-normal">H</span></p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="rounded-[2rem] bg-surface/40 backdrop-blur-md border border-border/50 p-4 text-center shadow-lg relative overflow-hidden flex flex-col justify-center">
+            <p class="text-[8px] font-black uppercase tracking-[0.2em] text-muted">Pending</p>
+            <p class="text-3xl font-black text-warning mt-1 tracking-tighter">{{ ops.trainerAttendanceSnapshot()?.pending_count || 0 }}</p>
+          </div>
+          <div class="rounded-[2rem] bg-surface/40 backdrop-blur-md border border-border/50 p-4 text-center shadow-lg relative overflow-hidden flex flex-col justify-center">
+            <p class="text-[8px] font-black uppercase tracking-[0.2em] text-muted">Approved</p>
+            <p class="text-3xl font-black text-success mt-1 tracking-tighter">{{ ops.trainerAttendanceSnapshot()?.approved_count || 0 }}</p>
+          </div>
+          <div class="rounded-[2rem] bg-surface/40 backdrop-blur-md border border-border/50 p-4 text-center shadow-lg relative overflow-hidden flex flex-col justify-center">
+            <p class="text-[8px] font-black uppercase tracking-[0.2em] text-muted">Rejected</p>
+            <p class="text-3xl font-black text-danger mt-1 tracking-tighter">{{ ops.trainerAttendanceSnapshot()?.rejected_count || 0 }}</p>
+          </div>
+          <div class="rounded-[2rem] bg-surface/40 backdrop-blur-md border border-border/50 p-4 text-center shadow-lg relative overflow-hidden flex flex-col justify-center">
+            <div class="absolute inset-0 bg-primary/5"></div>
+            <p class="text-[8px] font-black uppercase tracking-[0.2em] text-primary relative z-10">Days Logged</p>
+            <p class="text-3xl font-black text-primary mt-1 tracking-tighter relative z-10">{{ ops.trainerAttendanceSnapshot()?.current_month_days || 0 }}</p>
+          </div>
+        </div>
+
+        <div class="rounded-[2.5rem] bg-surface/40 backdrop-blur-md border border-border/50 p-4 sm:p-6 shadow-xl space-y-4 mt-2">
+          @if (ops.trainerAttendanceLoading()) {
+            <div class="rounded-[2rem] border border-border/30 bg-background/30 p-12 flex justify-center">
+              <svg class="h-8 w-8 animate-spin text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"></path></svg>
+            </div>
+          } @else if (ops.trainerAttendance().length === 0) {
+            <div class="rounded-[2rem] border border-dashed border-border/50 bg-background/30 p-12 text-center text-xs font-black uppercase tracking-widest text-muted">No shifts logged.</div>
+          } @else {
+            <div class="space-y-3">
+              @for (row of ops.trainerAttendance(); track row.id) {
+                <article class="rounded-[1.5rem] border border-border/50 bg-background/50 p-4 hover:border-primary/40 transition-colors backdrop-blur-sm">
+                  <div class="flex items-start justify-between gap-2">
+                    <div>
+                      <p class="text-sm font-black text-foreground uppercase tracking-wide">{{ row.attendance_date | date:'mediumDate' }}</p>
+                      <p class="text-[10px] font-bold text-muted mt-1">{{ format12Hour(row.start_time.slice(0, 5)) }} TO {{ format12Hour(row.end_time.slice(0, 5)) }}</p>
+                    </div>
+                    @if (row.status) {
+                      <span class="rounded-full border px-3 py-1.5 text-[8px] font-black uppercase tracking-[0.2em] whitespace-nowrap shadow-sm" [class]="statusClass(row.status)">
+                        {{ row.status }}
+                      </span>
+                    }
+                  </div>
+                  
+                  <div class="mt-3 pt-3 border-t border-border/30">
+                     <span class="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-[0.5rem] text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
+                      {{ durationLabel(row.start_time, row.end_time) }} LOGGED
+                    </span>
+                  </div>
+                </article>
+              }
+            </div>
+
+            <div class="flex items-center justify-between pt-4">
+              <div class="rounded-full border border-border/50 bg-background/50 px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] shadow-inner">
+                <span class="text-primary">{{ attendanceStart() }} - {{ attendanceEnd() }}</span>
+                <span class="text-muted mx-2">OF</span>
+                <span>{{ ops.trainerAttendanceTotal() }}</span>
+              </div>
+              <div class="flex gap-2">
+                <button type="button" (click)="attendancePrev()" [disabled]="ops.trainerAttendancePage() <= 1" class="h-10 w-10 rounded-full border border-border/50 bg-background/50 shadow-sm disabled:opacity-30 flex items-center justify-center hover:bg-surface transition-colors">
+                  <svg class="h-4 w-4 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button type="button" (click)="attendanceNext()" [disabled]="ops.trainerAttendancePage() >= attendanceTotalPages()" class="h-10 w-10 rounded-full border border-border/50 bg-background/50 shadow-sm disabled:opacity-30 flex items-center justify-center hover:bg-surface transition-colors">
+                  <svg class="h-4 w-4 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (ops.trainerActiveTab() === 'payments') {
+      <section class="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div class="rounded-[2.5rem] bg-foreground text-background p-6 shadow-2xl relative overflow-hidden">
+          <div class="absolute inset-0 opacity-[0.05]" style="background-image: repeating-linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), repeating-linear-gradient(45deg, #000 25%, #fff 25%, #fff 75%, #000 75%, #000); background-position: 0 0, 10px 10px; background-size: 20px 20px;"></div>
+          
+          <div class="relative z-10">
+            <p class="text-[9px] font-black uppercase tracking-[0.2em] text-background/60">Total Yield</p>
+            <p class="text-4xl sm:text-5xl font-black mt-1 tracking-tighter">{{ formatIndianPricing(ops.trainerPaymentSnapshot()?.total_paid) }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-[2rem] bg-surface/40 backdrop-blur-md border border-border/50 p-5 shadow-lg">
+            <p class="text-[8px] font-black uppercase tracking-[0.2em] text-muted">This Month</p>
+            <p class="text-2xl font-black text-primary mt-1 tracking-tighter">{{ formatIndianPricing(ops.trainerPaymentSnapshot()?.current_month_paid) }}</p>
+          </div>
+          <div class="rounded-[2rem] bg-surface/40 backdrop-blur-md border border-border/50 p-5 shadow-lg">
+            <p class="text-[8px] font-black uppercase tracking-[0.2em] text-muted">Payouts Completed</p>
+            <p class="text-2xl font-black text-success mt-1 tracking-tighter">{{ ops.trainerPaymentSnapshot()?.completed_count || 0 }}</p>
+          </div>
+        </div>
+
+        <div class="rounded-[2.5rem] bg-surface/40 backdrop-blur-md border border-border/50 p-5 shadow-xl">
+          <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-2">Earnings Velocity</h2>
+          @if (isChartReady() && (ops.trainerPaymentSnapshot()?.last_five_months?.length || 0) > 0) {
+            <div echarts [options]="chartOptions()" [autoResize]="true" class="w-full h-[180px]"></div>
+          } @else {
+            <div class="rounded-[2rem] border border-dashed border-border/50 bg-background/30 p-10 text-center text-[10px] font-black uppercase tracking-widest text-muted">Insufficient Data</div>
+          }
+        </div>
+
+        <div class="rounded-[2.5rem] bg-surface/40 backdrop-blur-md border border-border/50 p-5 shadow-xl space-y-4">
+          <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Ledger History</h2>
+          @if (ops.trainerPaymentsLoading()) {
+            <div class="rounded-[2rem] border border-border/30 bg-background/30 p-12 flex justify-center">
+              <svg class="h-8 w-8 animate-spin text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"></path></svg>
+            </div>
+          } @else if (ops.trainerPayments().length === 0) {
+            <div class="rounded-[2rem] border border-dashed border-border/50 bg-background/30 p-12 text-center text-[10px] font-black uppercase tracking-widest text-muted">No payouts recorded.</div>
+          } @else {
+            <div class="space-y-3">
+              @for (row of ops.trainerPayments(); track row.id) {
+                <article class="rounded-[1.5rem] border border-border/50 bg-background/50 p-4 backdrop-blur-sm hover:border-primary/40 transition-colors flex items-center justify-between">
+                  <div>
+                    <p class="text-xl font-black text-foreground tracking-tighter">{{ formatIndianPricing(row.amount) }}</p>
+                    <p class="text-[9px] font-black uppercase tracking-[0.2em] text-primary mt-1">{{ row.salary_month | date:'MMM yyyy' }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-muted">{{ row.payment_date | date:'mediumDate' }}</p>
+                  </div>
+                </article>
+              }
+            </div>
+
+            <div class="flex items-center justify-between pt-4">
+              <div class="rounded-full border border-border/50 bg-background/50 px-4 py-2 text-[9px] font-black uppercase tracking-[0.2em] shadow-inner">
+                <span class="text-primary">{{ paymentStart() }} - {{ paymentEnd() }}</span>
+                <span class="text-muted mx-2">OF</span>
+                <span>{{ ops.trainerPaymentsTotal() }}</span>
+              </div>
+              <div class="flex gap-2">
+                <button type="button" (click)="paymentPrev()" [disabled]="ops.trainerPaymentsPage() <= 1" class="h-10 w-10 rounded-full border border-border/50 bg-background/50 shadow-sm disabled:opacity-30 flex items-center justify-center hover:bg-surface transition-colors">
+                  <svg class="h-4 w-4 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <button type="button" (click)="paymentNext()" [disabled]="ops.trainerPaymentsPage() >= paymentTotalPages()" class="h-10 w-10 rounded-full border border-border/50 bg-background/50 shadow-sm disabled:opacity-30 flex items-center justify-center hover:bg-surface transition-colors">
+                  <svg class="h-4 w-4 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </main>
+</div>
+
+@if (activePicker() !== null) {
+  <div class="fixed inset-0 bg-background/60 backdrop-blur-md z-[90] animate-in fade-in duration-300" (click)="closeClock()"></div>
+  
+  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none">
+    <div class="w-full max-w-[300px] bg-surface/80 backdrop-blur-3xl border border-border/50 rounded-[2.5rem] p-6 shadow-[0_20px_60px_rgba(0,0,0,0.6)] pointer-events-auto animate-in zoom-in-95 duration-300 relative overflow-hidden">
+      
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="text-center mb-6 relative z-10">
+        <p class="text-[9px] font-black uppercase tracking-[0.3em] text-primary mb-1">{{ activePicker() === 'start' ? 'SET START' : 'SET END' }}</p>
+        
+        <div class="flex justify-center items-baseline gap-1 text-5xl font-black text-foreground tracking-tighter leading-none">
+          <span (click)="pickerMode.set('hour')" class="cursor-pointer transition-colors" [class.text-muted]="pickerMode() !== 'hour'">{{ pickerHour() | number:'2.0-0' }}</span>
+          <span class="text-muted/30 pb-1">:</span>
+          <span (click)="pickerMode.set('minute')" class="cursor-pointer transition-colors" [class.text-muted]="pickerMode() !== 'minute'">{{ pickerMinute() | number:'2.0-0' }}</span>
+        </div>
+        
+        <div class="flex justify-center mt-4">
+          <div class="flex bg-background/50 border border-border/50 rounded-full p-1 shadow-inner">
+            <button (click)="pickerAmPm.set('AM')" class="px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300" [class]="pickerAmPm() === 'AM' ? 'bg-foreground text-background shadow-md' : 'text-muted'">AM</button>
+            <button (click)="pickerAmPm.set('PM')" class="px-4 py-1.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300" [class]="pickerAmPm() === 'PM' ? 'bg-foreground text-background shadow-md' : 'text-muted'">PM</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative w-[220px] h-[220px] mx-auto bg-background/30 border border-border/30 rounded-full flex items-center justify-center mb-8 shadow-inner z-10">
+        <div class="absolute inset-0 rounded-full shadow-[inset_0_0_30px_rgba(0,0,0,0.15)]"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-primary absolute z-10 shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
+        
+        @if (pickerMode() === 'hour') {
+          @for (h of hours12; track h; let i = $index) {
+            <button (click)="setClockHour(h)" class="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-black transition-all z-20"
+              [class]="pickerHour() === h ? 'bg-primary text-primary-fg shadow-[0_0_15px_rgba(59,130,246,0.6)] scale-110' : 'text-foreground hover:bg-surface'"
+              [style.transform]="'rotate(' + (i * 30) + 'deg) translateY(-85px) rotate(' + (-i * 30) + 'deg)'">
+              {{ h }}
+            </button>
+          }
+        } @else {
+          @for (m of minutes60; track m; let i = $index) {
+            <button (click)="setClockMinute(m)" class="absolute w-10 h-10 rounded-full flex items-center justify-center text-xs font-black transition-all z-20"
+              [class]="pickerMinute() === m ? 'bg-primary text-primary-fg shadow-[0_0_15px_rgba(59,130,246,0.6)] scale-110' : 'text-foreground hover:bg-surface'"
+              [style.transform]="'rotate(' + (i * 30) + 'deg) translateY(-85px) rotate(' + (-i * 30) + 'deg)'">
+              {{ m | number:'2.0-0' }}
+            </button>
+          }
+        }
+      </div>
+
+      <div class="flex gap-2 relative z-10">
+        <button (click)="closeClock()" class="flex-1 rounded-full border border-border/50 bg-surface/50 px-2 py-3.5 text-[9px] font-black uppercase tracking-[0.2em] text-foreground active:scale-95 transition-transform">Cancel</button>
+        <button (click)="confirmTime()" class="flex-[2] rounded-full bg-primary px-2 py-3.5 text-[9px] font-black uppercase tracking-[0.2em] text-primary-fg shadow-lg active:scale-95 transition-transform">Confirm</button>
+      </div>
+    </div>
+  </div>
+}

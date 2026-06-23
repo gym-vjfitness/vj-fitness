@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+// 1. The custom breathing animation for the latest streak fire emoji
+@keyframes breathe {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(249, 115, 22, 0.6));
+  }
+  50% {
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 12px rgba(249, 115, 22, 1));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(249, 115, 22, 0.6));
+  }
+}
+
+.animate-breathe {
+  animation: breathe 2.5s ease-in-out infinite;
+  display: inline-block; // required for transform on emoji
+}
+
+// Ensure the Echarts container stays absolute fluid
+.echarts-fluid {
+  width: 100%;
+  height: 100%;
+}

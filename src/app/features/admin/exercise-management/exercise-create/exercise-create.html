@@ -1,0 +1,149 @@
+<div class="h-full bg-background text-foreground pb-2 font-sans selection:bg-primary/20 relative overflow-x-hidden">
+  
+  <div class="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none z-0"></div>
+
+  <!-- Top Right Back Button -->
+  <button type="button" (click)="goBack()" 
+    class="absolute top-6 right-4 sm:right-6 flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-surface/80 backdrop-blur-md border border-border/60 hover:bg-background hover:border-primary/40 text-muted hover:text-primary transition-all shadow-sm cursor-pointer group z-50">
+    <svg class="w-4 h-4 mr-1.5 sm:mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+    <span class="font-bold text-xs sm:text-sm tracking-wide">Back</span>
+  </button>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 relative z-10 pt-8 md:pt-12">
+    
+    <!-- Header -->
+    <header class="mb-12 text-center mt-6 sm:mt-0">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-[1.5rem] bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/30 mb-6 transform -rotate-6 hover:rotate-0 transition-transform duration-300">
+        <svg class="w-7 h-7 text-primary-fg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+        {{ isEditMode() ? 'Edit Exercise' : 'Craft an Exercise' }}
+      </h1>
+      <p class="text-muted mt-2 text-sm md:text-base">
+        {{ isEditMode() ? 'Update the details for this movement.' : 'Add a new movement to your library.' }}
+      </p>
+    </header>
+
+    @if (isFetchingData()) {
+      <div class="flex flex-col items-center justify-center py-20 animate-in fade-in text-muted">
+        <svg class="animate-spin h-10 w-10 text-primary mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <span class="text-sm font-medium">Loading details...</span>
+      </div>
+    } @else {
+      <form [formGroup]="exerciseForm" class="space-y-6 md:space-y-8 animate-in fade-in duration-500">
+
+        <!-- Identity / Name Input -->
+        <div class="bg-surface/50 p-2 rounded-[2rem] border border-border/50 shadow-sm backdrop-blur-md relative z-10 focus-within:border-primary/50 transition-colors">
+          <input type="text" formControlName="name" placeholder="Exercise Name (e.g., Bench Press)"
+            class="w-full bg-transparent border-0 outline-none focus:outline-none focus:ring-0 px-6 py-5 text-lg md:text-xl font-bold text-foreground placeholder:text-muted transition-all">
+          
+          @if (exerciseForm.get('name')?.invalid && exerciseForm.get('name')?.touched) {
+            <p class="text-danger text-xs font-bold mt-1 ml-6 mb-3">An exercise name is required</p>
+          }
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- Muscle Dropdown -->
+          <div class="custom-dropdown relative w-full flex flex-col bg-surface/40 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] border border-border/30 transition-all duration-500 group" [class.z-50]="isMuscleDropdownOpen()">
+            <label class="text-xs font-bold text-muted uppercase tracking-widest mb-3 flex items-center gap-2">
+              <span class="text-accent text-base">🎯</span> Target Muscle
+            </label>
+            
+            <div class="relative" (click)="toggleMuscleDropdown($event)">
+              <div [class.border-primary]="isMuscleDropdownOpen()" [class.shadow-[0_0_0_1px_rgba(var(--primary),0.3)]]="isMuscleDropdownOpen()" class="w-full bg-background/50 border border-border/50 text-foreground text-sm py-3 px-4 rounded-2xl flex justify-between items-center cursor-pointer hover:border-primary/50 transition-all">
+                <span [class.text-muted]="!exerciseForm.get('target_muscle_group')?.value" class="font-medium truncate">
+                  {{ exerciseForm.get('target_muscle_group')?.value || 'Select primary focus...' }}
+                </span>
+                <svg [class.rotate-180]="isMuscleDropdownOpen()" class="h-4 w-4 text-muted transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+
+              @if (isMuscleDropdownOpen()) {
+                <div class="absolute top-full left-0 w-full mt-2 bg-surface/95 backdrop-blur-3xl border border-border/50 rounded-2xl shadow-xl max-h-[250px] overflow-y-auto custom-scrollbar z-50 py-1">
+                  @for (muscle of muscleGroups; track muscle.name; let last = $last) {
+                    <div (click)="selectMuscle(muscle.name, $event)" class="flex items-center gap-3 px-4 py-2 hover:bg-background/80 transition-all cursor-pointer" [class.border-b]="!last" [class.border-border/30]="!last">
+                      <div [class]="muscle.colorClass + ' w-7 h-7 shrink-0 rounded flex items-center justify-center border'">
+                        <svg class="w-4 h-4 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="muscle.path"/></svg>
+                      </div>
+                      <span class="font-bold text-foreground/80 text-sm truncate">{{ muscle.name }}</span>
+                      @if (exerciseForm.get('target_muscle_group')?.value === muscle.name) {
+                        <svg class="w-4 h-4 ml-auto text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Equipment Dropdown -->
+          <div class="custom-dropdown relative w-full flex flex-col bg-surface/40 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] border border-border/30 transition-all duration-500 group" [class.z-50]="isEquipmentDropdownOpen()">
+            <label class="text-xs font-bold text-muted uppercase tracking-widest mb-3 flex items-center gap-2">
+              <span class="text-primary text-base">🏋️</span> Equipment
+            </label>
+            
+            <div class="relative" (click)="toggleEquipmentDropdown($event)">
+              <div [class.border-primary]="isEquipmentDropdownOpen()" [class.shadow-[0_0_0_1px_rgba(var(--primary),0.3)]]="isEquipmentDropdownOpen()" class="w-full bg-background/50 border border-border/50 text-foreground text-sm py-3 px-4 rounded-2xl flex justify-between items-center cursor-pointer hover:border-primary/50 transition-all">
+                <span [class.text-muted]="!exerciseForm.get('equipment_required')?.value" class="font-medium truncate">
+                  {{ exerciseForm.get('equipment_required')?.value || 'Select required gear...' }}
+                </span>
+                <svg [class.rotate-180]="isEquipmentDropdownOpen()" class="h-4 w-4 text-muted transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+
+              @if (isEquipmentDropdownOpen()) {
+                <div class="absolute top-full left-0 w-full mt-2 bg-surface/95 backdrop-blur-3xl border border-border/50 rounded-2xl shadow-xl max-h-[250px] overflow-y-auto custom-scrollbar z-50 py-1">
+                  @for (eq of equipmentList; track eq.name; let last = $last) {
+                    <div (click)="selectEquipment(eq.name, $event)" class="flex items-center gap-3 px-4 py-2 hover:bg-background/80 transition-all cursor-pointer" [class.border-b]="!last" [class.border-border/30]="!last">
+                      <div [class]="eq.colorClass + ' w-7 h-7 shrink-0 rounded flex items-center justify-center border'">
+                        <svg class="w-4 h-4 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path [attr.d]="eq.path"/></svg>
+                      </div>
+                      <span class="font-bold text-foreground/80 text-sm truncate">{{ eq.name }}</span>
+                      @if (exerciseForm.get('equipment_required')?.value === eq.name) {
+                        <svg class="w-4 h-4 ml-auto text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <div class="relative w-full flex flex-col bg-surface/40 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] border border-border/30">
+          <label class="text-xs font-bold text-muted uppercase tracking-widest mb-3 flex items-center gap-2">
+            <span class="text-rose-500 text-base">▶️</span> Media Link
+          </label>
+          <div class="flex items-center bg-background/50 border border-border/50 rounded-2xl focus-within:border-rose-500 transition-all px-3 py-1">
+            <svg class="text-muted w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            <input type="text" formControlName="video_url" placeholder="Paste YouTube, Vimeo, or Drive link..."
+              class="w-full bg-transparent border-none py-2.5 px-3 focus:ring-0 focus:outline-none text-sm text-foreground placeholder:text-muted/40 font-medium">
+          </div>
+        </div>
+
+        <div class="relative w-full flex flex-col bg-surface/40 backdrop-blur-xl p-5 md:p-6 rounded-[2rem] border border-border/30">
+          <label class="text-xs font-bold text-muted uppercase tracking-widest mb-3 flex items-center gap-2">
+            <span class="text-info text-base">📝</span> Execution Details
+          </label>
+          <textarea formControlName="description" rows="3" placeholder="Brief cues. e.g. Keep chest up, drive through the heels..."
+            class="w-full bg-background/50 border border-border/50 py-3 px-4 rounded-2xl focus:border-info focus:outline-none text-sm text-foreground transition-all placeholder:text-muted/40 font-medium resize-y"></textarea>
+        </div>
+
+        <!-- Document Flow Submit Button (Same layout strategy as Plan Library) -->
+        <div class="mt-10 pt-8 border-t border-border/50 flex flex-col items-center">
+          <button type="button" (click)="saveExercise()" [disabled]="isLoading()"
+            class="w-full md:w-auto min-w-[280px] bg-foreground text-background hover:bg-primary hover:text-primary-fg px-8 py-4 rounded-full font-extrabold text-sm shadow-xl transition-all flex items-center justify-center gap-2 cursor-pointer outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (isLoading()) {
+              <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              Saving...
+            } @else {
+              {{ isEditMode() ? 'Update Exercise' : 'Save Exercise' }}
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            }
+          </button>
+        </div>
+
+      </form>
+    }
+  </div>
+</div>

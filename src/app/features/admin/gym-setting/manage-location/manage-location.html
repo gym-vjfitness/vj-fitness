@@ -1,0 +1,70 @@
+<div class="h-full w-full max-w-5xl mx-auto p-4 md:p-8">
+  
+  <div class="mb-4 flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl md:text-3xl font-bold text-foreground tracking-tight">Gym Location</h2>
+      <p class="text-sm md:text-base text-muted mt-1">Tap the map to set your exact facility coordinates.</p>
+    </div>
+  </div>
+
+  <div class="relative bg-surface rounded-3xl shadow-lg border border-border overflow-hidden flex flex-col h-[65vh] min-h-[500px]">
+    
+    @if (isLoading()) {
+      <div class="absolute inset-0 flex items-center justify-center bg-background/60  z-50">
+        <div class="w-10 h-10 border-4 border-border border-t-foreground rounded-full animate-spin"></div>
+      </div>
+    }
+
+    <!-- Map Container (Full Bleed) -->
+    <div id="gym-map" class="absolute inset-0 w-full h-full z-0"></div>
+      
+    <!-- Top Actions Layer (Floating) -->
+    <div class="absolute top-0 left-0 right-0 z-10 flex  bg-background/60  sm:flex-row items-center justify-between gap-2 pointer-events-none">
+      
+      <!-- Premium Floating Coordinates Pill -->
+      <div class="bg-surface/90 border border-border rounded-full px-5 py-2.5 shadow-lg pointer-events-auto flex items-center gap-3">
+        <span class="flex h-2.5 w-2.5 rounded-full bg-danger shadow-[0_0_8px_var(--danger)]"></span>
+        <div class="text-sm font-mono font-medium text-foreground tracking-wide">
+          @if (currentLocation()) {
+            {{ currentLocation()![0] | number:'1.5-5' }}, {{ currentLocation()![1] | number:'1.5-5' }}
+          } @else {
+            <span class="text-muted">Select a location</span>
+          }
+        </div>
+      </div>
+
+      <!-- Foreground Background Rounded Button -->
+      <button 
+        (click)="useCurrentDeviceLocation()"
+        [disabled]="isLocating()"
+        class="pointer-events-auto flex items-center justify-center gap-2 p-2 mr-1 text-sm font-bold text-background bg-foreground rounded-full shadow-xl hover:opacity-90 transition-all active:scale-95 disabled:opacity-70 disabled:active:scale-100 shrink-0">
+        
+        @if (isLocating()) {
+          <svg class="animate-spin h-4 w-4 text-success" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" class="text-background" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        }
+      </button>
+
+    </div>
+
+    <!-- Bottom Footer (Floating) -->
+    <div class="absolute bottom-0 left-0 right-0 z-10 pt-1 bg-background/60  pointer-events-none">
+      <button 
+        (click)="saveLocation()"
+        [disabled]="!hasChanged() || isSaving()"
+        class="pointer-events-auto w-full py-4 px-6 text-base font-bold rounded-full shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
+        [class]="hasChanged() ? 'bg-foreground text-primary-fg hover:opacity-90 active:scale-[0.98]' : 'bg-surface text-muted cursor-not-allowed border border-border opacity-80'">
+        
+        @if (isSaving()) {
+          <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          Saving...
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          {{ isNew() ? 'Save Location' : 'Update Location' }}
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

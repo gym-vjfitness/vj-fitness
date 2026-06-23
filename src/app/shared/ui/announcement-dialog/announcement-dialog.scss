@@ -1,0 +1,36 @@
+/* Hides scrollbar but keeps scroll functionality intact */
+.hidden-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* 1. Sweeping Glass Shimmer */
+@keyframes premium-shimmer {
+  0% { transform: translateX(-150%) skewX(-25deg); opacity: 0; }
+  5% { opacity: 1; }
+  15%, 100% { transform: translateX(250%) skewX(-25deg); opacity: 0; }
+}
+.animate-shimmer {
+  animation: premium-shimmer 6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+/* 2. Slow Breathing Background Orbs */
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.2; }
+  50% { transform: scale(1.2) translate(-10px, 10px); opacity: 0.4; }
+}
+.animate-orb {
+  animation: orb-breathe 8s ease-in-out infinite;
+}
+
+/* 3. NEW PREMIUM: Weightless Floating for Icons */
+@keyframes float-premium {
+  0%, 100% { transform: translateY(0) scale(1) rotate(-1deg); filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); }
+  50% { transform: translateY(-8px) scale(1.02) rotate(1deg); filter: drop-shadow(0 20px 25px rgba(0,0,0,0.6)); }
+}
+.animate-float-premium {
+  animation: float-premium 5s ease-in-out infinite;
+}

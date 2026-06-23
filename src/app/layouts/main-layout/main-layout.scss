@@ -1,0 +1,45 @@
+/* Fix for mobile tap highlights leaving gray boxes */
+.tap-highlight-transparent {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbars elegantly while keeping functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Intense Futuristic Glow (Double Drop-Shadow) */
+.neon-glow {
+  filter: drop-shadow(0 0 12px var(--color-primary)) drop-shadow(0 0 4px var(--color-primary));
+}
+
+/* Elegant, Slow Glass Shimmer (2s sweep, 5s pause) */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-150%) skewX(-25deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  30% {
+    transform: translateX(150%) skewX(-25deg);
+    opacity: 1;
+  }
+  40% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(150%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+.animate-shimmer {
+  /* 7s total cycle creates a very natural, premium rhythm */
+  animation: shimmer 7s infinite ease-in-out; 
+}

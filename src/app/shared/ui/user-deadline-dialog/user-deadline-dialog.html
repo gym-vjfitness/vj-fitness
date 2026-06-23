@@ -1,0 +1,123 @@
+@if (deadlineService.showDialog()) {
+<!-- Immersive Cinematic Backdrop - Added h-[100dvh] for mobile browser address bar safety -->
+<div class="fixed inset-0 h-[100dvh] z-[100] flex flex-col justify-center bg-background/90 backdrop-blur-[40px] transition-opacity duration-700 animate-fade-in overflow-hidden">
+
+  <!-- Ambient Moving Light Orbs -->
+  <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-danger/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob pointer-events-none"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-warning/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000 pointer-events-none"></div>
+
+  <!-- Top Navigation Area -->
+  <div class="absolute top-8 w-full px-6 sm:px-8 flex justify-between items-center z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full border border-border/50 flex items-center justify-center bg-surface/30 backdrop-blur-md">
+        <svg class="w-5 h-5 text-foreground animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+      </div>
+      <span class="text-sm font-bold tracking-[0.2em] uppercase text-foreground/80">Action Required</span>
+    </div>
+
+    @if (!deadlineService.isLockedOut()) {
+    <button (click)="close()" class="w-10 h-10 rounded-full border border-border/50 flex items-center justify-center bg-surface/30 backdrop-blur-md text-foreground/50 hover:text-foreground hover:bg-surface transition-all">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+    }
+  </div>
+
+  <!-- FULL SCREEN SNAP CAROUSEL -->
+  <div class="w-full overflow-x-auto snap-x snap-mandatory hide-scrollbar flex items-center h-full relative z-10" (scroll)="onScroll($event)">
+
+    @for (card of deadlineService.warnings(); track card.type; let i = $index) {
+    <!-- CARD WRAPPER - Adjusted padding (py-24) to ensure space for top nav and bottom dots -->
+    <div class="w-full shrink-0 snap-center px-4 sm:px-12 flex justify-center items-center h-full py-24">
+
+      <!-- PREMIUM GLASSMORPHISM CARD - Removed aspect-[4/5], added max-h-full & min-h-[400px] -->
+      <div class="w-full max-w-sm max-h-full min-h-[400px] bg-surface/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden relative group transition-transform duration-500 ease-out flex flex-col"
+        [class.scale-100]="activeIndex === i" [class.scale-90]="activeIndex !== i"
+        [class.opacity-100]="activeIndex === i" [class.opacity-40]="activeIndex !== i">
+
+        <!-- Dynamic Inner Glow based on status -->
+        <div class="absolute inset-0 opacity-20 transition-opacity duration-500 group-hover:opacity-40"
+          [class.bg-gradient-to-b]="true" [class.from-danger]="card.type === 'expiry' || card.isOverdue"
+          [class.from-warning]="card.type === 'due' && !card.isOverdue" class="to-transparent mix-blend-overlay pointer-events-none"></div>
+
+        <!-- CARD HEADER: shrink-0 to prevent compression -->
+        <div class="px-6 sm:px-8 pt-8 pb-2 relative z-10 shrink-0">
+          <p class="text-[10px] font-black uppercase tracking-[0.3em] mb-2"
+            [class.text-danger]="card.type === 'expiry' || card.isOverdue"
+            [class.text-warning]="card.type === 'due' && !card.isOverdue">
+            {{ card.title }}
+          </p>
+
+          <!-- Massive Number Display -->
+          <div class="flex items-baseline gap-2">
+            @if (deadlineService.isLockedOut()) {
+            <h1 class="text-6xl font-black tracking-tighter text-foreground">0</h1>
+            } @else {
+            <h1 class="text-6xl font-black tracking-tighter text-foreground">{{ card.daysLeft }}</h1>
+            }
+            <span class="text-lg font-bold text-muted uppercase tracking-widest">{{ card.isOverdue ? 'Days Late' : 'Days Left' }}</span>
+          </div>
+        </div>
+
+        <!-- CARD BODY: overflow-y-auto ensures long dynamic text doesn't break layout -->
+        <div class="px-6 sm:px-8 mt-4 mb-4 relative z-10 flex-1 overflow-y-auto hide-scrollbar">
+          <p class="text-base font-medium text-foreground/80 leading-relaxed">
+            {{ card.message }}
+          </p>
+
+          <!-- Premium Amount Display -->
+          @if (card.amount) {
+          <div class="mt-6 p-4 rounded-2xl bg-background/50 border border-white/5 backdrop-blur-md flex justify-between items-center">
+            <span class="text-xs font-bold text-muted uppercase tracking-wider">Amount Due</span>
+            <span class="text-xl font-black text-foreground">₹{{ card.amount }}</span>
+          </div>
+          }
+        </div>
+
+        <!-- CARD FOOTER: shrink-0 ensures the button is ALWAYS intact and visible at the bottom -->
+        <div class="p-6 pt-0 relative z-10 w-full mt-auto shrink-0">
+          <!-- Glowing Sweep Button -->
+          <button (click)="goToPayment(card)"
+            class="relative w-full h-14 rounded-2xl font-bold text-base overflow-hidden group/btn shadow-xl transition-transform active:scale-95"
+            [class.bg-danger]="card.type === 'expiry' || deadlineService.isLockedOut() || card.isOverdue"
+            [class.text-white]="card.type === 'expiry' || deadlineService.isLockedOut() || card.isOverdue"
+            [class.bg-foreground]="card.type === 'due' && !card.isOverdue && !deadlineService.isLockedOut()"
+            [class.text-background]="card.type === 'due' && !card.isOverdue && !deadlineService.isLockedOut()">
+
+            <!-- Sweep Animation Element -->
+            <span class="absolute inset-0 w-full h-full -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover/btn:animate-shimmer"></span>
+
+            <span class="relative flex items-center justify-center gap-2">
+              Complete Payment
+              <svg class="w-5 h-5 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Floating Bottom Navigation Dots -->
+  <div class="absolute bottom-8 left-0 w-full flex justify-center items-center z-50 pointer-events-none">
+    @if (deadlineService.warnings().length > 1) {
+    <div class="flex items-center gap-3 bg-surface/50 backdrop-blur-xl px-4 py-2 rounded-full border border-white/10">
+      @for (card of deadlineService.warnings(); track $index) {
+      <div class="h-1.5 rounded-full transition-all duration-500 ease-out" 
+        [class.w-8]="activeIndex === $index"
+        [class.bg-foreground]="activeIndex === $index" 
+        [class.w-1.5]="activeIndex !== $index"
+        [class.bg-foreground/30]="activeIndex !== $index"></div>
+      }
+    </div>
+    }
+  </div>
+
+</div>
+}

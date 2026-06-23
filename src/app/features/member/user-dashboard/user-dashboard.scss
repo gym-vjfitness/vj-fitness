@@ -1,0 +1,28 @@
+
+  /* Premium Embedded Animations */
+  @keyframes goldShimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .animate-gold-text {
+    background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 25%, #fef3c7 50%, #fbbf24 75%, #f59e0b 100%);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: goldShimmer 4s linear infinite;
+  }
+  @keyframes elegantFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .animate-elegant-float {
+    animation: elegantFloat 4s ease-in-out infinite;
+  }
+  @keyframes subtlePulseBg {
+    0%, 100% { opacity: 0.05; }
+    50% { opacity: 0.15; }
+  }
+  .animate-bg-pulse {
+    animation: subtlePulseBg 3s ease-in-out infinite;
+  }

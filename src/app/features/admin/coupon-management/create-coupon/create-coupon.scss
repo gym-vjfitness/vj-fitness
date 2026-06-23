@@ -1,0 +1,11 @@
+
+  /* Premium Theme-Based Shine */
+  @keyframes theme-shine {
+    0% { transform: translateX(-150%) skewX(-25deg); opacity: 0; }
+    5% { opacity: 0.8; }
+    15% { transform: translateX(250%) skewX(-25deg); opacity: 0; }
+    100% { transform: translateX(250%) skewX(-25deg); opacity: 0; }
+  }
+  .animate-theme-shine { 
+    animation: theme-shine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite; 
+  }

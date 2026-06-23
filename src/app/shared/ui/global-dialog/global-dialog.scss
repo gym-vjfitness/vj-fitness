@@ -1,0 +1,57 @@
+/* 1. Backdrop Animations */
+.dialog-backdrop {
+  animation: backdropFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.dialog-closing .dialog-backdrop {
+  animation: backdropFadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 2. Mobile Animations (Slide Up/Down from bottom edge) */
+.dialog-panel {
+  transform-origin: bottom center;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.dialog-closing .dialog-panel {
+  animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 3. Desktop Animations (Scale In/Out from center) */
+@media (min-width: 768px) {
+  .dialog-panel {
+    transform-origin: center center;
+    animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .dialog-closing .dialog-panel {
+    animation: scaleOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+}
+
+/* --- Keyframes --- */
+@keyframes backdropFadeIn { 
+  from { opacity: 0; } 
+  to { opacity: 1; } 
+}
+@keyframes backdropFadeOut { 
+  from { opacity: 1; } 
+  to { opacity: 0; } 
+}
+
+/* Mobile Keys */
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes slideDown {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
+}
+
+/* Desktop Keys */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes scaleOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.95) translateY(10px); }
+}

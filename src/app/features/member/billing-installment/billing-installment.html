@@ -1,0 +1,256 @@
+<div class="h-full bg-background text-foreground font-sans p-4 sm:p-6 lg:p-10  selection:bg-primary/20">
+  
+  <div class="max-w-3xl mx-auto space-y-6 pb-4">
+    
+    <header class="mb-8">
+      <h1 class="text-3xl font-black uppercase tracking-tight text-foreground">My Pass</h1>
+      <p class="text-[10px] font-bold uppercase tracking-widest text-muted mt-1">Manage your membership & payments</p>
+    </header>
+
+    @if (isLoading()) {
+      <div class="h-48 bg-surface rounded-[2rem] border border-border animate-pulse"></div>
+    } 
+    @else if (!subscription()) {
+      <div class="bg-surface border border-border rounded-[2rem] p-10 text-center flex flex-col items-center justify-center">
+        <svg class="w-12 h-12 text-muted mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4M8 16l-4-4 4-4" /></svg>
+        <p class="text-lg font-black text-foreground uppercase tracking-wider">No Active Pass</p>
+        <p class="text-xs font-bold text-muted mt-2 mb-6">You don't have any active memberships right now.</p>
+        <button routerLink="/member/plans" class="bg-primary text-primary-fg px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-lg shadow-primary/20">View Plans</button>
+      </div>
+    } 
+    @else {
+      
+      <!-- REJECTED 2ND INSTALLMENT ACTION BLOCK -->
+      @if (rejectedPayment(); as rejPay) {
+        <div class="bg-surface border-2 border-red-500/30 rounded-[2rem] p-6 sm:p-8 flex flex-col items-center justify-center text-center relative overflow-hidden mb-6 shadow-lg shadow-red-500/10">
+
+          @if (isSubmittingRejectedUtr()) {
+            <!-- Premium Spinner -->
+            <div class="flex flex-col items-center justify-center space-y-5 animate-in fade-in zoom-in duration-500 py-4">
+              <div class="premium-spinner">
+                <div class="loader-ring"></div>
+                <div class="loader-ring"></div>
+                <div class="loader-ring"></div>
+              </div>
+              <p class="text-[10px] font-black uppercase tracking-[0.2em] text-foreground animate-pulse">
+                Processing Data...
+              </p>
+            </div>
+          } @else {
+            <!-- Rejected Input State -->
+            <div class="animate-in fade-in duration-300 flex flex-col items-center w-full">
+              <div class="w-12 h-12 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mb-3 border border-red-500/30 shadow-lg shadow-red-500/20">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h4 class="text-sm font-black uppercase tracking-widest mb-1 text-red-500">2nd Installment Rejected</h4>
+              <p class="text-[9px] font-bold text-muted uppercase leading-tight mb-4">
+                Please provide a valid UTR / Reference No.<br>to verify your second installment.
+              </p>
+              
+              <div class="flex items-center gap-2 w-full max-w-sm px-2">
+                <input #newUtrInput type="text"
+                       (input)="sanitizeAlphanumeric($event, newUtrInput)"
+                       placeholder="ENTER VALID UTR"
+                       class="w-full text-xs px-4 py-3 rounded-full bg-background border border-red-500/40 focus:border-red-500  outline-none text-foreground font-black uppercase tracking-widest placeholder:text-muted/60 transition-all shadow-inner">
+                
+                <button (click)="submitRejectedUtr(rejPay.id, newUtrInput)" 
+                        [disabled]="!newUtrInput.value.trim() || isSubmittingRejectedUtr()" 
+                        class="shrink-0 bg-red-500 text-white h-[42px] w-[42px] rounded-full flex items-center justify-center transition-all hover:bg-red-600 active:scale-95 disabled:opacity-40 disabled:active:scale-100 shadow-lg shadow-red-500/20">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (duePayment(); as duePay) {
+        <div class="bg-warning/10 border border-warning/30 rounded-[2rem] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in slide-in-from-top-4">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-warning/20 text-warning flex items-center justify-center shrink-0">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <div>
+              <p class="text-[10px] font-black uppercase tracking-[0.2em] text-warning mb-1">Action Required</p>
+              <p class="text-lg font-black text-foreground">₹{{ duePay.amount }} Due</p>
+              <p class="text-xs font-bold text-muted mt-0.5">Installment {{ duePay.installment_number }} is due by {{ formatDate(duePay.due_date) }}</p>
+            </div>
+          </div>
+          <button 
+            (click)="openPaymentModal(duePay)"
+            class="w-full sm:w-auto bg-warning text-warning-fg px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-lg shadow-warning/20 shrink-0">
+            Pay Now
+          </button>
+        </div>
+      }
+
+      <div class="bg-surface border border-border rounded-[2rem] overflow-hidden relative">
+        <div class="h-2 w-full absolute top-0 left-0 
+          {{ subscription().status === 'ACTIVE' ? 'bg-success' : 
+             subscription().status === 'PENDING' ? 'bg-warning' : 
+             subscription().status === 'PAUSED' ? 'bg-muted' : 'bg-danger' }}">
+        </div>
+
+        <div class="p-6 sm:p-8">
+          <div class="flex justify-between items-start mb-8">
+            <div>
+              <p class="text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-2">Current Plan</p>
+              <h2 class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-foreground">{{ subscription().purchased_plan_name }}</h2>
+            </div>
+            <span class="px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest
+              {{ subscription().status === 'ACTIVE' ? 'bg-success/10 text-success' : 
+                 subscription().status === 'PENDING' ? 'bg-warning/10 text-warning' : 
+                 subscription().status === 'PAUSED' ? 'bg-muted/10 text-muted' : 'bg-danger/10 text-danger' }}">
+              {{ subscription().status }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-background border border-border rounded-2xl p-4">
+              <p class="text-[9px] font-bold uppercase tracking-widest text-muted mb-1">Activation</p>
+              <p class="text-sm font-black text-foreground">{{ formatDate(subscription().start_date) }}</p>
+            </div>
+            <div class="bg-background border border-border rounded-2xl p-4">
+              <p class="text-[9px] font-bold uppercase tracking-widest text-muted mb-1">Expiration</p>
+              <p class="text-sm font-black text-foreground">{{ formatDate(subscription().end_date) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-muted mb-4">Your Payment History</p>
+        <div class="space-y-3">
+          @for (payment of payments(); track payment.id) {
+            <div class="flex items-center justify-between p-4 rounded-2xl border bg-surface border-border">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0
+                  {{ payment.status === 'PAID' ? 'bg-success/10 text-success' : 
+                     payment.status === 'PENDING_VERIFICATION' ? 'bg-warning/10 text-warning' : 
+                     payment.status === 'REJECTED' ? 'bg-danger/10 text-danger' : 'bg-muted/10 text-muted' }}">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    @if (payment.status === 'PAID') { <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /> }
+                    @else if (payment.status === 'PENDING_VERIFICATION') { <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /> }
+                    @else if (payment.status === 'REJECTED') { <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /> }
+                    @else { <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /> }
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-xs font-black uppercase tracking-widest text-foreground">Installment {{ payment.installment_number }}</p>
+                  <p class="text-[10px] font-bold text-muted tracking-wide mt-0.5">
+                    {{ payment.status === 'PAID' ? 'Verified on ' + formatDate(payment.verified_at!) : 
+                       payment.status === 'PENDING_VERIFICATION' ? 'Verification in progress' : 
+                       payment.status === 'REJECTED' ? 'Action needed above' :
+                       'Due ' + formatDate(payment.due_date) }}
+                  </p>
+                </div>
+              </div>
+              <p class="text-sm font-black text-foreground">₹{{ payment.amount }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (showPaymentModal() && activePendingPayment(); as payment) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+      
+      <div class="w-full max-w-md bg-surface border border-border rounded-[2rem] shadow-2xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-4 duration-300">
+        
+        <div class="px-6 py-5 border-b border-border/50 flex items-center justify-between shrink-0">
+          <span class="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Clear Dues</span>
+          <button (click)="closePaymentModal()" class="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center text-foreground hover:bg-border transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <div class="p-6 max-h-[75vh] overflow-y-auto space-y-6">
+          
+          <div class="text-center">
+                    <p
+                      class="text-[12px] font-bold text-foreground uppercase tracking-[0.2em] mb-1 flex items-center justify-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="3">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {{ bankAccountName() }}
+                    </p>
+
+                    <div class="flex items-center justify-center gap-2">
+                      <p class="text-sm font-bold text-muted tracking-widest lowercase">{{ adminUpiId() }}</p>
+
+                      <button (click)="copyUpiId()"
+                        class="text-muted hover:text-primary transition-colors focus:outline-none" title="Copy UPI ID"
+                        aria-label="Copy UPI ID">
+
+                        @if (isCopied()) {
+                        <svg class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                          stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        } @else {
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        }
+
+                      </button>
+                    </div>
+                  </div>
+
+          <div class="shrink-0 flex flex-col items-center justify-center">
+            <div class="bg-background p-2 rounded-2xl shadow-[0_10px_40px_-10px_var(--primary)] overflow-hidden mb-4">
+              <div #qrCanvas class="w-[220px] h-[220px] flex items-center justify-center [&>svg]:w-full [&>svg]:h-full"></div>
+            </div>
+            <!-- <p class="text-[12px] font-bold text-foreground uppercase tracking-[0.2em] mb-1 flex items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {{ bankAccountName() }}
+            </p>
+            <p class="text-[9px] font-bold text-muted tracking-widest lowercase">{{ adminUpiId() }}</p> -->
+          </div>
+
+          <div class="block lg:hidden">
+            <button (click)="openUpiApp()" class="w-full bg-background border border-primary text-primary py-4 rounded-full text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-primary/5 transition-all">
+              Pay via UPI App
+            </button>
+            <div class="flex items-center gap-4 my-4 opacity-50">
+              <div class="h-px bg-border flex-1"></div>
+              <span class="text-[9px] font-bold text-foreground uppercase">OR Paste UTR</span>
+              <div class="h-px bg-border flex-1"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              </div>
+              <input type="text" [(ngModel)]="newUtrNumber" placeholder="ENTER 12-DIGIT UTR" class="w-full bg-background border border-border rounded-full pl-14 pr-6 py-4 text-center text-sm font-bold uppercase tracking-[0.1em] text-foreground focus:outline-none focus:border-primary transition-colors">
+            </div>
+            
+            <button 
+              (click)="submitInstallment()" 
+              [disabled]="isProcessing() || newUtrNumber().length < 8" 
+              class="w-full mt-4 bg-primary text-primary-fg py-4 rounded-full text-[11px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-40 transition-all">
+              @if (isProcessing()) {
+                <span class="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin"></span>
+                Submitting
+              } @else {
+                Verify Payment
+              }
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

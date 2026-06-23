@@ -1,0 +1,178 @@
+@if (!isLoading()) {
+<div class="relative z-10 h-full bg-transparent p-4 md:p-8 animate-fade-in font-sans overflow-x-hidden pb-4">
+  <div class="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+
+    <!-- HIGH-END HERO BENTO -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
+
+      <!-- Identity & Welcome Card (Spans 8 cols on tablet/desktop) -->
+      <div
+        class="md:col-span-8 rounded-[2rem] sm:rounded-[2.5rem] bg-foreground text-background p-6 sm:p-10 shadow-2xl shadow-primary/5 relative overflow-hidden group flex flex-col justify-between min-h-[180px] sm:min-h-[220px]">
+
+        <!-- Elegant glowing orbs embedded in the card -->
+        <div
+          class="absolute -right-20 -top-20 w-64 h-64 bg-primary/20 blur-[80px] rounded-full pointer-events-none group-hover:bg-primary/30 transition-all duration-700">
+        </div>
+        <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-accent/20 blur-[80px] rounded-full pointer-events-none">
+        </div>
+
+        <div class="flex justify-between items-start relative z-10">
+          <div>
+            <div
+              class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-background/10 backdrop-blur-md border border-background/20 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-background/90 mb-4 sm:mb-6">
+              <div class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></div>
+              Staff Terminal Active
+            </div>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1]">
+              {{ greeting() }},<br>
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                Coach {{ (trainer()?.full_name || 'Staff').split(' ')[0] }}
+              </span>
+            </h1>
+          </div>
+
+          <div [routerLink]="['/trainer/profile']" 
+     class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 aspect-square rounded-full bg-background/10 backdrop-blur-md border border-background/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center justify-center text-background cursor-pointer hover:bg-background/20 active:scale-95 sm:hover:scale-105 transition-all duration-300 group">
+  
+  <svg class="w-5 h-5 sm:w-6 sm:h-6 opacity-90 group-hover:opacity-100 transition-opacity" 
+       xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="8" r="5"></circle>
+    <path d="M20 21a8 8 0 0 0-16 0"></path>
+  </svg>
+
+</div>
+        </div>
+
+        <div class="relative z-10 mt-8 flex items-center justify-between border-t border-background/10 pt-4">
+          <p class="text-xs sm:text-sm font-medium text-background/70">{{ totalActiveModules() }} authorized modules
+            available.</p>
+        </div>
+      </div>
+
+      <!-- Integrated Clock Card (Spans 4 cols on tablet/desktop) -->
+      <div
+        class="md:col-span-4 rounded-[2rem] sm:rounded-[2.5rem] bg-surface/80 backdrop-blur-2xl border border-border/40 p-6 sm:p-8 shadow-sm relative overflow-hidden flex flex-col justify-center items-center text-center min-h-[140px] sm:min-h-[220px] group hover:border-primary/30 transition-colors">
+
+        <svg
+          class="absolute -right-6 -bottom-6 w-40 h-40 opacity-[0.02] text-foreground pointer-events-none rotate-12 group-hover:scale-110 transition-transform duration-700"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+
+        <div class="relative z-10">
+          <span
+            class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter text-foreground block leading-none mb-2 sm:mb-3">{{
+            currentTime() }}</span>
+          <span class="text-xs sm:text-sm font-bold text-muted uppercase tracking-widest block">{{ currentDate()
+            }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ZERO PERMISSION FALLBACK -->
+    @if (totalActiveModules() === 0) {
+    <div
+      class="py-16 sm:py-24 px-4 flex flex-col items-center justify-center text-center bg-surface/30 backdrop-blur-xl rounded-[2.5rem] border border-dashed border-border/60 mt-6">
+      <div
+        class="w-20 h-20 rounded-full bg-surface border border-border/40 flex items-center justify-center mb-5 shadow-sm text-muted">
+        <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+      </div>
+      <h3 class="text-xl sm:text-2xl font-black text-foreground tracking-tight mb-2">Terminal Locked</h3>
+      <p class="text-sm text-muted font-medium max-w-sm">You do not have administrative clearance for any operational
+        modules. Please request access from the system administrator.</p>
+    </div>
+    }
+
+    <!-- CATEGORIZED MODULE GRID -->
+    <div class="space-y-8 sm:space-y-10 mt-6 sm:mt-10">
+      @for (category of moduleCategories(); track category.title) {
+
+      <div class="animate-fade-in">
+        <!-- Category Header -->
+        <div class="flex items-center gap-3 mb-4 sm:mb-5 pl-1 sm:pl-2">
+          <h3 class="text-sm sm:text-base font-black text-foreground tracking-tight">{{ category.title }}</h3>
+          <div class="h-[1px] flex-grow bg-gradient-to-r from-border/80 to-transparent"></div>
+        </div>
+
+        <!-- Dynamic Grid (Responsive to card count) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+          @for (mod of category.modules; track mod.id) {
+
+          <div [routerLink]="[mod.route]"
+            class="group relative bg-surface/60 backdrop-blur-xl border border-border/40 rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-border/80 min-h-[130px] sm:min-h-[160px] flex flex-col justify-between">
+
+            <!-- Subtle Top-Right Glow Effect on Hover -->
+            <div
+              class="absolute -right-10 -top-10 w-24 h-24 blur-2xl rounded-full opacity-0 group-hover:opacity-50 transition-opacity duration-500 pointer-events-none"
+              [ngClass]="mod.bgClass.split(' ')[0]"></div>
+
+            <div class="flex justify-between items-start relative z-10">
+              <div
+                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center border shadow-sm transition-transform duration-300 group-hover:scale-110"
+                [ngClass]="mod.bgClass + ' ' + mod.colorClass">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="mod.iconPath" />
+                </svg>
+              </div>
+
+              <!-- Arrow Indicator -->
+              <div
+                class="w-6 h-6 rounded-full bg-background/50 border border-border/40 flex items-center justify-center text-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="mt-4 sm:mt-6 relative z-10">
+              <h4 class="text-[13px] sm:text-[15px] font-black text-foreground tracking-tight leading-tight">{{
+                mod.title }}</h4>
+              <p class="text-[10px] sm:text-xs font-bold text-muted mt-0.5 sm:mt-1">{{ mod.subtitle }}</p>
+            </div>
+          </div>
+
+          }
+        </div>
+      </div>
+
+      }
+    </div>
+
+  </div>
+</div>
+} @else {
+<!-- PREMIUM SKELETON LOADER -->
+<div class="min-h-screen bg-transparent p-4 md:p-8 font-sans overflow-x-hidden pb-24">
+  <div class="max-w-6xl mx-auto space-y-6 sm:space-y-8">
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 animate-pulse">
+      <div
+        class="md:col-span-8 h-[180px] sm:h-[220px] rounded-[2rem] sm:rounded-[2.5rem] bg-surface/80 border border-border/40">
+      </div>
+      <div
+        class="md:col-span-4 h-[140px] sm:h-[220px] rounded-[2rem] sm:rounded-[2.5rem] bg-surface/80 border border-border/40">
+      </div>
+    </div>
+
+    <div class="space-y-4 sm:space-y-6 pt-4 animate-pulse">
+      <div class="h-5 w-40 bg-surface/80 rounded-full border border-border/40 ml-2"></div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+        <div class="h-[130px] sm:h-[160px] rounded-[1.5rem] sm:rounded-[2rem] bg-surface/60 border border-border/40">
+        </div>
+        <div class="h-[130px] sm:h-[160px] rounded-[1.5rem] sm:rounded-[2rem] bg-surface/60 border border-border/40">
+        </div>
+        <div class="h-[130px] sm:h-[160px] rounded-[1.5rem] sm:rounded-[2rem] bg-surface/60 border border-border/40">
+        </div>
+        <div class="h-[130px] sm:h-[160px] rounded-[1.5rem] sm:rounded-[2rem] bg-surface/60 border border-border/40">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+}

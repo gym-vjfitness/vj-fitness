@@ -1,0 +1,86 @@
+::ng-deep .qr-canvas-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  
+  svg, canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    /* Forces the layout container engine to prevent shape distortion (keeps elements perfectly square) */
+    object-fit: contain !important; 
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+}
+
+/* --- FULLSCREEN STYLING INTERCEPT MANIFESTS --- */
+.fullscreen-container:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  background-color: var(--background) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+
+  // .fullscreen-close-btn {
+  //   position: absolute !important;
+  //   top: 40px !important;
+  //   left: 50% !important;
+  //   transform: translateX(-50%) !important;
+  // }
+
+  .qr-bounding-box {
+    /* Blows up the QR block safely to 92% of the viewport width/height, keeping layout symmetry crisp */
+    width: 92vmin !important;
+    height: 92vmin !important;
+    max-width: none !important;
+  }
+}
+
+/* Webkit Core Engine Fallback Overrides (Safari / iOS Ecosystems) */
+.fullscreen-container:-webkit-full-screen {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  background-color: var(--background) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+
+  // .fullscreen-close-btn {
+  //   position: absolute !important;
+  //   top: 40px !important;
+  //   left: 50% !important;
+  //   transform: translateX(-50%) !important;
+  // }
+
+  .qr-bounding-box {
+    width: 92vmin !important;
+    height: 92vmin !important;
+    max-width: none !important;
+  }
+}
+
+/* --- ANIMATIONS AND TIMING RING METRICS --- */
+.progress-ring {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  transition: stroke 0.5s ease-in-out; 
+}
+
+.animate-progress {
+  animation: progress-drain 30s linear forwards; 
+}
+
+@keyframes progress-drain {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 100; }
+}
