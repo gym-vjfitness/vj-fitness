@@ -5,7 +5,7 @@
   "scope": "./",
   "start_url": "./",
   "theme_color": "#000000",
-  "background_color": "#ffffff",
+  "background_color": "#170a06",
   "icons": [
     {
       "src": "assets/gym_logo_transperant.png",
