@@ -78,6 +78,10 @@ export class SubscriptionDetail implements OnInit {
   });
 
   isFormValid = computed(() => {
+    // ADDED: Prevent saving if core dates have been cleared
+    if (!this.editStartDate() || this.editStartDate().trim() === '') return false;
+    if (!this.editEndDate() || this.editEndDate().trim() === '') return false;
+
     if (this.editStatus() === 'PAUSED') {
       return this.editPausedAt().trim() !== '' && this.editPauseReason().trim() !== '';
     }
@@ -207,7 +211,13 @@ export class SubscriptionDetail implements OnInit {
 
     if (activeType === 'start') {
       const today = new Date(); today.setHours(0, 0, 0, 0);
-      const minDate = new Date(today); minDate.setDate(today.getDate() - 15);
+
+      // --- TEMPORARY DATE LIMIT CHANGE ---
+      // Changed from 15 days in the past to 365 days (1 year) for admin use.
+      // TO REVERT: Change `today.getDate() - 365` back to `today.getDate() - 15`
+      const minDate = new Date(today); minDate.setDate(today.getDate() - 365);
+      // -----------------------------------
+
       const maxDate = new Date(today); maxDate.setDate(today.getDate() + 15);
       const checkDate = new Date(y, this.viewMonthIndex(), day); checkDate.setHours(0, 0, 0, 0);
       return checkDate < minDate || checkDate > maxDate;
