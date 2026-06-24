@@ -2,6 +2,7 @@ import { Component, signal, computed, OnDestroy, AfterViewInit, ViewChild, Eleme
 import { CommonModule } from '@angular/common';
 import QRCodeStyling from 'qr-code-styling';
 import * as CryptoJS from 'crypto-js';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-qr-desk',
@@ -15,8 +16,8 @@ export class AdminQrDesk implements AfterViewInit, OnDestroy {
   @ViewChild('qrContainer', { static: false }) qrContainer!: ElementRef;
   @ViewChild('fullscreenArea', { static: false }) fullscreenArea!: ElementRef;
 
-  gymId = 'GYM_12345';
-  private readonly SECRET_KEY = 'YOUR_SUPER_SECRET_GYM_KEY';
+  gymId = environment.gymId;
+  private readonly SECRET_KEY = environment.SECRET_KEY;
 
   private readonly MAX_TIME = 30;
   refreshCountdown = signal<number>(this.MAX_TIME);

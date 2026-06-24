@@ -10,6 +10,7 @@ import { ToastService } from '../../../services/toast-service';
 import * as CryptoJS from 'crypto-js';
 import { SettingService } from '../../../services/setting-service';
 import QrScanner from 'qr-scanner';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-attendance',
@@ -30,7 +31,7 @@ export class Attendance implements OnInit, OnDestroy {
   storageService = inject(StorageService);
   settingService = inject(SettingService);
 
-  private readonly SECRET_KEY = 'YOUR_SUPER_SECRET_GYM_KEY';
+  private readonly SECRET_KEY = environment.SECRET_KEY;
 
   isLoading = signal<boolean>(false);
   loadingMessage = signal<string>('');
@@ -51,7 +52,8 @@ export class Attendance implements OnInit, OnDestroy {
   private coinInterval: any;
   private scrambleInterval: any;
 
-  gymId = 'GYM_12345';
+  gymId = environment.gymId;
+  
   gymLatitude = signal<number | null>(null);
   gymLongitude = signal<number | null>(null);
 
@@ -269,7 +271,8 @@ export class Attendance implements OnInit, OnDestroy {
     const now = Date.now();
     const isCheckedIn = this.isCheckedIn();
     const lockKey = isCheckedIn ? 'lastCheckInTime' : 'lastCheckOutTime';
-    const lockMs = 1 * 60 * 1000;
+    // CHANGED: 20 minutes (in ms) if checked in, 8 hours (in ms) if checked out
+    const lockMs = isCheckedIn ? (20 * 60 * 1000) : (8 * 60 * 60 * 1000);
 
     const lastStr = localStorage.getItem(lockKey);
     if (lastStr) {
@@ -285,7 +288,9 @@ export class Attendance implements OnInit, OnDestroy {
   private triggerLock(type: 'checkIn' | 'checkOut') {
     const lockKey = type === 'checkIn' ? 'lastCheckInTime' : 'lastCheckOutTime';
     localStorage.setItem(lockKey, Date.now().toString());
-    this.startCooldownTimer(1 * 60);
+    // CHANGED: 20 minutes (in seconds) for checkIn, 8 hours (in seconds) for checkOut
+    const cooldownSeconds = type === 'checkIn' ? (20 * 60) : (8 * 60 * 60);
+    this.startCooldownTimer(cooldownSeconds);
   }
 
   private startCooldownTimer(seconds: number) {
@@ -502,7 +507,7 @@ export class Attendance implements OnInit, OnDestroy {
         this.toastService.error('You logged in another device');
         return;
       } else if (error.message && error.message.includes('COOLDOWN_ACTIVE')) {
-        this.toastService.error('You must wait for 6 hrs before starting a new session.');
+        this.toastService.error('You must wait for 8 hrs before starting a new session.');
       } else if (error.message && error.message.includes('SESSION_ALREADY_ACTIVE')) {
         this.toastService.error('Syncing session from your other device...');
         const user = this.supabaseService.currentUser();
